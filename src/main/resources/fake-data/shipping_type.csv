@@ -1,0 +1,7 @@
+id;name;logo;status;code_country;address_id
+1;Expédition aérienne;../fake-data/blob/plane.txt;ACTIVE;FR;3
+1;Expédition aérienne;../fake-data/blob/plane.txt;ACTIVE;USA;3
+2;Expédition maritime;../fake-data/blob/ship.txt;ACTIVE;FR
+2;Expédition maritime;../fake-data/blob/ship.txt;ACTIVE;USA
+3;Expédition express;../fake-data/blob/speed.txt;ACTIVE;FR
+3;Expédition express;../fake-data/blob/speed.txt;ACTIVE;USA

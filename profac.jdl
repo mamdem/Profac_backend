@@ -1,0 +1,95 @@
+entity Company{
+    name String required unique
+    status CompanyStatus
+}
+enum CompanyStatus{
+    ACTIVE
+    INACTIVE
+}
+entity AppUser {
+    firstName String
+    lastName String
+    password String
+    phoneNumber String required
+    address String
+    userType UserType
+}
+enum UserType {
+    SELLER,
+    CASHIER
+}
+entity Category {
+    name String required
+    status CategoryStatus
+}
+enum CategoryStatus{
+    ACTIVE
+    INACTIVE
+}
+entity Invoice{
+    invoiceNumber Long
+    customer String
+    invoiceDate String
+    quantity Integer
+    status InvoiceStatus
+}
+enum InvoiceStatus{
+    PENDING,
+    PAID,
+    UNPAID
+}
+
+entity Product {
+    productNumber Integer required unique
+    name String required unique
+    amount BigDecimal required
+    description TextBlob
+    status ProductStatus
+}
+enum ProductStatus{
+    ACTIVE,
+    INACTIVE,
+    OUT_OF_STOCK,
+    THRESHOLD
+}
+entity Stock {
+    totalAmount BigDecimal required
+    totalAmountSold BigDecimal required
+    initialQuantity Integer required
+    remainingQuantity Integer required
+    status StockStatus
+}
+enum StockStatus{
+    ACTIVE,
+    INACTIVE
+}
+
+entity Image{
+    url TextBlob
+    status ImageStatus
+}
+enum ImageStatus{
+    ACTIVE
+    INACTIVE
+}
+
+relationship OneToMany{
+    Company{appUsers} to AppUser
+    Product{stocks} to Stock
+    Product{images} to Image
+}
+relationship ManyToOne {
+    Product{category} to Category
+}
+
+relationship OneToOne {
+    AppUser{avatar} to Image
+}
+relationship ManyToMany {
+    Invoice{products} to Product
+}
+
+paginate all with pagination
+dto * with mapstruct
+service all with serviceImpl
+microservice * with core

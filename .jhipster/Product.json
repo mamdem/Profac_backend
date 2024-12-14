@@ -1,0 +1,58 @@
+{
+  "applications": "*",
+  "changelogDate": "20240902094923",
+  "dto": "mapstruct",
+  "entityTableName": "product",
+  "fields": [
+    {
+      "fieldName": "productNumber",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "amount",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "text"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "ProductStatus",
+      "fieldValues": "ACTIVE,INACTIVE,OUT_OF_STOCK,THRESHOLD"
+    }
+  ],
+  "microserviceName": "core",
+  "name": "Product",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "stock",
+      "relationshipName": "stocks",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "image",
+      "relationshipName": "images",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityName": "category",
+      "relationshipName": "category",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

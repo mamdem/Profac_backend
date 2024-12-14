@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <!--
+        Added the constraints for entity Authority.
+    -->
+    <changeSet id="20240902094523-2" author="jhipster">
+
+        <addForeignKeyConstraint baseColumnNames="authority_id"
+                                 baseTableName="rel_authority__app_users"
+                                 constraintName="fk_rel_authority__app_users__authority_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="authority"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="app_users_id"
+                                 baseTableName="rel_authority__app_users"
+                                 constraintName="fk_rel_authority__app_users__app_users_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="app_user"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="authority_id"
+                                 baseTableName="rel_authority__companies"
+                                 constraintName="fk_rel_authority__companies__authority_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="authority"
+                                 />
+
+        <addForeignKeyConstraint baseColumnNames="companies_id"
+                                 baseTableName="rel_authority__companies"
+                                 constraintName="fk_rel_authority__companies__companies_id"
+                                 referencedColumnNames="id"
+                                 referencedTableName="company"
+                                 />
+    </changeSet>
+</databaseChangeLog>

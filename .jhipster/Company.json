@@ -1,0 +1,47 @@
+{
+  "applications": "*",
+  "changelogDate": "20240902094523",
+  "dto": "mapstruct",
+  "entityTableName": "company",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "validUntil",
+      "fieldType": "Instant"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "CompanyStatus",
+      "fieldValues": "ACTIVE,EXPIRED,INACTIVE"
+    },
+    {
+      "fieldName": "password",
+      "fieldType": "String"
+    }
+  ],
+  "microserviceName": "core",
+  "name": "Company",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "appUser",
+      "relationshipName": "appUsers",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "product",
+      "otherEntityRelationshipName": "company",
+      "relationshipName": "products",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

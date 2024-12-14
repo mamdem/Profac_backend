@@ -1,0 +1,24 @@
+{
+  "applications": "*",
+  "changelogDate": "20240902095123",
+  "dto": "mapstruct",
+  "entityTableName": "image",
+  "fields": [
+    {
+      "fieldName": "url",
+      "fieldType": "byte[]",
+      "fieldTypeBlobContent": "text"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "ImageStatus",
+      "fieldValues": "ACTIVE,INACTIVE"
+    }
+  ],
+  "microserviceName": "core",
+  "name": "Image",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

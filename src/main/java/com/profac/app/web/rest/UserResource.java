@@ -124,15 +124,10 @@ public class UserResource {
                 if (Boolean.TRUE.equals(loginExists)) {
                     return Mono.error(new LoginAlreadyUsedException());
                 }
-                return userRepository.findOneByEmailIgnoreCase(userDTO.getEmail());
+                return Mono.empty();
             })
             .hasElement()
-            .flatMap(emailExists -> {
-                if (Boolean.TRUE.equals(emailExists)) {
-                    return Mono.error(new EmailAlreadyUsedException());
-                }
-                return userService.createUser(userDTO);
-            })
+            .flatMap(emailExists -> userService.createUser(userDTO))
             .doOnSuccess(mailService::sendCreationEmail)
             .map(user -> {
                 try {
@@ -141,7 +136,7 @@ public class UserResource {
                         .headers(HeaderUtil.createAlert(applicationName, "userManagement.created", user.getLogin()))
                         .body(user);
                 } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
+                    throw new RuntimeException(e.getMessage());
                 }
             });
     }

@@ -1,0 +1,52 @@
+{
+  "applications": "*",
+  "changelogDate": "20240902094623",
+  "dto": "mapstruct",
+  "entityTableName": "app_user",
+  "fields": [
+    {
+      "fieldName": "firstName",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "lastName",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "password",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "phoneNumber",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "address",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "userType",
+      "fieldType": "UserType",
+      "fieldValues": "SELLER,CASHIER"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "appUserStatus",
+      "fieldValues": "ACTIVE,INACTIVE"
+    }
+  ],
+  "microserviceName": "core",
+  "name": "AppUser",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "image",
+      "relationshipName": "avatar",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

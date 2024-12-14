@@ -1,0 +1,39 @@
+{
+  "applications": "*",
+  "changelogDate": "20240902095023",
+  "dto": "mapstruct",
+  "entityTableName": "stock",
+  "fields": [
+    {
+      "fieldName": "totalAmount",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "totalAmountSold",
+      "fieldType": "BigDecimal",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "initialQuantity",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "remainingQuantity",
+      "fieldType": "Integer",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "StockStatus",
+      "fieldValues": "ACTIVE,INACTIVE"
+    }
+  ],
+  "microserviceName": "core",
+  "name": "Stock",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

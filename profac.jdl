@@ -1,9 +1,12 @@
 entity Company{
     name String required unique
+    validUntil Instant
     status CompanyStatus
+    password String
 }
 enum CompanyStatus{
     ACTIVE
+    EXPIRED
     INACTIVE
 }
 entity AppUser {
@@ -77,6 +80,7 @@ relationship OneToMany{
     Company{appUsers} to AppUser
     Product{stocks} to Stock
     Product{images} to Image
+    Company{products} to Product
 }
 relationship ManyToOne {
     Product{category} to Category

@@ -1,0 +1,24 @@
+{
+  "applications": "*",
+  "changelogDate": "20240902094723",
+  "dto": "mapstruct",
+  "entityTableName": "category",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "CategoryStatus",
+      "fieldValues": "ACTIVE,INACTIVE"
+    }
+  ],
+  "microserviceName": "core",
+  "name": "Category",
+  "pagination": "pagination",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceImpl"
+}

@@ -1,11 +1,13 @@
 package com.profac.app.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.profac.app.security.SecurityUtils;
 import jakarta.persistence.Column;
 import java.io.Serializable;
 import java.time.Instant;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import reactor.core.publisher.Mono;
 
 /**
  * Base abstract class for entities which will hold definitions for created, last modified, created by,
@@ -32,6 +34,16 @@ public abstract class AbstractAuditingEntity<T> implements Serializable {
     @Column(name = "last_modified_date")
     private Instant lastModifiedDate = Instant.now();
 
+    public Mono<Void> initAuditFields() {
+        return SecurityUtils.getCurrentUserLogin()
+            .flatMap(userLogin -> {
+                this.createdBy = userLogin;
+                this.lastModifiedBy = userLogin;
+                setCreatedBy(userLogin);
+                setLastModifiedBy(userLogin);
+                return Mono.empty();
+            });
+    }
     public String getCreatedBy() {
         return createdBy;
     }

@@ -1,3 +1,0 @@
-id;last_name;first_name;phone_number;email;civility;password;loyalty_point;lang;company_name;business_sector;user_type;account_type_id;address_id
-1;Niass;Imam Hassane;771249886;iniass@gmail.com;MR;passer123;0;FR;;;INDIVIDUAL;1;2
-2;Ndoye;Abdoulaye;771050106;andoye@gmail.com;MR;passer123;0;EN;Resolve IT;Technology;LEGAL_ENTITY;2;1

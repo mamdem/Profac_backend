@@ -18,9 +18,9 @@ public class AdminUserDTO implements Serializable {
 
     private Long id;
 
-    @NotBlank
-    @Pattern(regexp = Constants.LOGIN_REGEX)
-    @Size(min = 1, max = 50)
+    //@NotBlank
+    //@Pattern(regexp = Constants.LOGIN_REGEX)
+    //@Size(min = 1, max = 50)
     private String login;
 
     @Size(max = 50)
@@ -29,8 +29,7 @@ public class AdminUserDTO implements Serializable {
     @Size(max = 50)
     private String lastName;
 
-    @Email
-    @Size(min = 5, max = 254)
+
     private String email;
 
     @Size(max = 256)
@@ -50,6 +49,7 @@ public class AdminUserDTO implements Serializable {
     private Instant lastModifiedDate;
 
     private Set<String> authorities;
+    private String password;
 
     public AdminUserDTO() {
         // Empty constructor needed for Jackson.
@@ -192,5 +192,13 @@ public class AdminUserDTO implements Serializable {
             ", lastModifiedDate=" + lastModifiedDate +
             ", authorities=" + authorities +
             "}";
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

@@ -26,23 +26,41 @@ management:
         enabled: false
 
 spring:
+  datasource:
+    url: jdbc:postgresql://57.129.4.79:5432/profac
+    username: postgres
+    password:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+  r2dbc:
+    url: r2dbc:postgresql://57.129.4.79:5432/profac
+    username: postgres
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  liquibase:
+    contexts: prod
+    url: jdbc:postgresql://57.129.4.79:5432/profac
+    username: postgres
+    password:
   devtools:
     restart:
       enabled: false
     livereload:
       enabled: false
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
-  liquibase:
-    contexts: prod
-    url: jdbc:postgresql://localhost:5432/profac
   mail:
     host: localhost
     port: 25
     username:
-    password:
-  r2dbc:
-    url: r2dbc:postgresql://localhost:5432/profac
-    username: profac
     password:
   thymeleaf:
     cache: true

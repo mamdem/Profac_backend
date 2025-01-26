@@ -6,6 +6,7 @@ import com.profac.app.service.InvoiceService;
 import com.profac.app.service.dto.InvoiceDTO;
 import com.profac.app.service.dto.InvoiceResponseDTO;
 import com.profac.app.service.dto.ProductDTO;
+import com.profac.app.utils.exception.BusinessBadRequestException;
 import com.profac.app.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -63,7 +64,7 @@ public class InvoiceResource {
     @PostMapping("")
     @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<InvoiceDTO>> createInvoice(@RequestBody InvoiceDTO invoiceDTO) throws URISyntaxException {
-        log.debug("REST request to save Invoice : {}", invoiceDTO);
+      try {  log.debug("REST request to save Invoice : {}", invoiceDTO);
         if (invoiceDTO.getId() != null) {
             throw new BadRequestAlertException("A new invoice cannot already have an ID", ENTITY_NAME, "idexists");
         }
@@ -79,6 +80,10 @@ public class InvoiceResource {
                     throw new RuntimeException(e);
                 }
             });
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -97,7 +102,7 @@ public class InvoiceResource {
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody InvoiceDTO invoiceDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update Invoice : {}, {}", id, invoiceDTO);
+     try {   log.debug("REST request to update Invoice : {}, {}", id, invoiceDTO);
         if (invoiceDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -122,6 +127,10 @@ public class InvoiceResource {
                             .body(result)
                     );
             });
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -141,7 +150,7 @@ public class InvoiceResource {
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody InvoiceDTO invoiceDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Invoice partially : {}, {}", id, invoiceDTO);
+       try{ log.debug("REST request to partial update Invoice partially : {}, {}", id, invoiceDTO);
         if (invoiceDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -167,6 +176,10 @@ public class InvoiceResource {
                             .body(res)
                     );
             });
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -175,9 +188,13 @@ public class InvoiceResource {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
-        log.debug("REST request to get a page of Invoices");
+      try{  log.debug("REST request to get a page of Invoices");
         return invoiceService.findAll(page, size)
-            .map(ResponseEntity::ok); // Wrap the result in a ResponseEntity
+            .map(ResponseEntity::ok);
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -189,9 +206,13 @@ public class InvoiceResource {
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<InvoiceDTO>> getInvoice(@PathVariable Long id) {
-        log.debug("REST request to get Invoice : {}", id);
+       try{ log.debug("REST request to get Invoice : {}", id);
         Mono<InvoiceDTO> invoiceDTO = invoiceService.findOne(id);
         return ResponseUtil.wrapOrNotFound(invoiceDTO);
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -203,7 +224,7 @@ public class InvoiceResource {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<Void>> deleteInvoice(@PathVariable Long id) {
-        log.debug("REST request to delete Invoice : {}", id);
+        try{log.debug("REST request to delete Invoice : {}", id);
         return invoiceService
             .delete(id)
             .then(
@@ -214,5 +235,9 @@ public class InvoiceResource {
                         .build()
                 )
             );
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 }

@@ -4,6 +4,7 @@ import com.profac.app.repository.StockRepository;
 import com.profac.app.security.AuthoritiesConstants;
 import com.profac.app.service.StockService;
 import com.profac.app.service.dto.StockDTO;
+import com.profac.app.utils.exception.BusinessBadRequestException;
 import com.profac.app.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -63,6 +64,7 @@ public class StockResource {
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public Mono<ResponseEntity<StockDTO>> createStock(@Valid @ModelAttribute StockDTO stockDTO, @RequestPart("file") FilePart image) throws URISyntaxException {
+       try{
         log.debug("REST request to save Stock : {}", stockDTO);
         if (stockDTO.getId() != null) {
             throw new BadRequestAlertException("A new stock cannot already have an ID", ENTITY_NAME, "idexists");
@@ -79,6 +81,10 @@ public class StockResource {
                     throw new RuntimeException(e);
                 }
             });
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -97,7 +103,8 @@ public class StockResource {
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody StockDTO stockDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update Stock : {}, {}", id, stockDTO);
+     try {
+         log.debug("REST request to update Stock : {}, {}", id, stockDTO);
         if (stockDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -122,6 +129,10 @@ public class StockResource {
                             .body(result)
                     );
             });
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -141,7 +152,7 @@ public class StockResource {
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody StockDTO stockDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update Stock partially : {}, {}", id, stockDTO);
+     try {   log.debug("REST request to partial update Stock partially : {}, {}", id, stockDTO);
         if (stockDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -167,6 +178,10 @@ public class StockResource {
                             .body(res)
                     );
             });
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -184,7 +199,7 @@ public class StockResource {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
-        log.debug("REST request to get a page of Stocks");
+      try {  log.debug("REST request to get a page of Stocks");
         return stockService
             .countAll()
             .zipWith(stockService.findAll(page, size).collectList())
@@ -199,6 +214,10 @@ public class StockResource {
                     )
                     .body(countWithEntities.getT2())
             );
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -210,9 +229,13 @@ public class StockResource {
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public Mono<ResponseEntity<StockDTO>> getStock(@PathVariable Long id) {
-        log.debug("REST request to get Stock : {}", id);
+       try{ log.debug("REST request to get Stock : {}", id);
         Mono<StockDTO> stockDTO = stockService.findOne(id);
         return ResponseUtil.wrapOrNotFound(stockDTO);
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -224,7 +247,7 @@ public class StockResource {
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public Mono<ResponseEntity<Void>> deleteStock(@PathVariable Long id) {
-        log.debug("REST request to delete Stock : {}", id);
+     try{   log.debug("REST request to delete Stock : {}", id);
         return stockService
             .delete(id)
             .then(
@@ -235,5 +258,9 @@ public class StockResource {
                         .build()
                 )
             );
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 }

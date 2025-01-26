@@ -3,6 +3,7 @@ package com.profac.app.repository;
 import com.profac.app.domain.AppUser;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
@@ -15,6 +16,7 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface AppUserRepository extends ReactiveCrudRepository<AppUser, Long>, AppUserRepositoryInternal {
     Flux<AppUser> findAllBy(Pageable pageable);
+    Flux<AppUser> findAllBy();
 
     @Query("SELECT * FROM app_user entity WHERE entity.avatar_id = :id")
     Flux<AppUser> findByAvatar(Long id);
@@ -36,10 +38,11 @@ public interface AppUserRepository extends ReactiveCrudRepository<AppUser, Long>
 
     @Override
     Mono<AppUser> findById(Long id);
-    Mono<AppUser> findByPhoneNumber(String phone);
-
     @Override
     Mono<Void> deleteById(Long id);
+
+    @Query("SELECT * FROM app_user entity INNER JOIN company c ON entity.company_id = c.id WHERE entity.phone_number = :phone")
+    Mono<AppUser> findByPhoneNumber(@Param("phone") String phone);
 }
 
 interface AppUserRepositoryInternal {

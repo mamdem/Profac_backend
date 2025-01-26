@@ -11,6 +11,7 @@ import com.profac.app.service.CompanyService;
 import com.profac.app.service.dto.AdminUserDTO;
 import com.profac.app.service.dto.CompanyDTO;
 import com.profac.app.service.mapper.CompanyMapper;
+import com.profac.app.utils.exception.BusinessBadRequestException;
 import com.profac.app.utils.exception.BusinessNotFoundException;
 import com.profac.app.web.rest.UserResource;
 import org.slf4j.Logger;
@@ -37,14 +38,13 @@ public class CompanyServiceImpl implements CompanyService {
     private final Logger log = LoggerFactory.getLogger(CompanyServiceImpl.class);
 
     private final CompanyRepository companyRepository;
-
-    private final CompanyMapper companyMapper;
     private final AuthorityRepository authorityRepository;
     private final UserResource userResource;
     private final AppUserService appUserService;
-    public CompanyServiceImpl(CompanyRepository companyRepository, CompanyMapper companyMapper, AuthorityRepository authorityRepository, UserResource userResource, AppUserService appUserService) {
+    public CompanyServiceImpl(CompanyRepository companyRepository,
+                              AuthorityRepository authorityRepository,
+                              UserResource userResource, AppUserService appUserService) {
         this.companyRepository = companyRepository;
-        this.companyMapper = companyMapper;
         this.authorityRepository = authorityRepository;
         this.userResource = userResource;
         this.appUserService = appUserService;
@@ -67,12 +67,12 @@ public class CompanyServiceImpl implements CompanyService {
         adminUserDTO.setPassword(company.getPassword());
 
         return company.initAuditFields().then( authoritiesMono
-            .flatMap(authorities -> {
-                adminUserDTO.setAuthorities(authorities);
-                return userResource.createUser(adminUserDTO);
-            })
-            .flatMap(user -> companyRepository.save(company)
-                .map(this::toDto)))
+                .flatMap(authorities -> {
+                    adminUserDTO.setAuthorities(authorities);
+                    return userResource.createUser(adminUserDTO);
+                })
+                .flatMap(user -> companyRepository.save(company)
+                    .map(this::toDto)))
             .doOnSuccess(dto -> log.debug("Saved company: {}", dto));
     }
 
@@ -83,10 +83,16 @@ public class CompanyServiceImpl implements CompanyService {
     }
     @Override
     public Mono<Company> findByPhoneNumber() {
-        return SecurityUtils.getCurrentUserLogin()
+        try{   return SecurityUtils.getCurrentUserLogin()
             .flatMap(login -> companyRepository.findByPhoneNumber(login)
-                  .switchIfEmpty(appUserService.findByPhoneNumber(login).flatMap(appUser -> companyRepository.findById(appUser.getCompany().getId()))))
+                .switchIfEmpty(appUserService.findByPhoneNumber(login)
+                    .flatMap(appUser -> companyRepository
+                        .findById(appUser.getCompany().getId()))))
             .switchIfEmpty(Mono.error(new BusinessNotFoundException("No company find!")));
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
+        }
     }
 
     @Override

@@ -7,6 +7,8 @@ import com.profac.app.service.ProductService;
 import com.profac.app.service.dto.CategoryDTO;
 import com.profac.app.service.dto.CompanyDTO;
 import com.profac.app.service.dto.ProductDTO;
+import com.profac.app.utils.exception.BusinessBadRequestException;
+import com.profac.app.utils.exception.BusinessNotFoundException;
 import com.profac.app.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -68,22 +70,27 @@ public class CompanyResource {
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.SUPER_ADMIN + "\")")
     public Mono<ResponseEntity<CompanyDTO>> createCompany(@Valid @RequestBody CompanyDTO companyDTO) {
-        log.debug("REST request to save Company : {}", companyDTO);
-        if (companyDTO.getId() != null) {
-            throw new BadRequestAlertException("A new company cannot already have an ID", ENTITY_NAME, "idexists");
+        try{
+            log.debug("REST request to save Company : {}", companyDTO);
+            if (companyDTO.getId() != null) {
+                throw new BadRequestAlertException("A new company cannot already have an ID", ENTITY_NAME, "idexists");
+            }
+            return companyService
+                .save(companyDTO)
+                .map(result -> {
+                    try {
+                        return ResponseEntity
+                            .created(new URI("/api/companies/" + result.getId()))
+                            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                            .body(result);
+                    } catch (URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
         }
-        return companyService
-            .save(companyDTO)
-            .map(result -> {
-                try {
-                    return ResponseEntity
-                        .created(new URI("/api/companies/" + result.getId()))
-                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-                        .body(result);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
     }
 
     /**
@@ -94,15 +101,15 @@ public class CompanyResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated companyDTO,
      * or with status {@code 400 (Bad Request)} if the companyDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the companyDTO couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.SUPER_ADMIN + "\")")
     public Mono<ResponseEntity<CompanyDTO>> updateCompany(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody CompanyDTO companyDTO
-    ) throws URISyntaxException {
-        log.debug("REST request to update Company : {}, {}", id, companyDTO);
+    ) {
+      try{
+          log.debug("REST request to update Company : {}, {}", id, companyDTO);
         if (companyDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -127,6 +134,10 @@ public class CompanyResource {
                             .body(result)
                     );
             });
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -145,7 +156,8 @@ public class CompanyResource {
     public Mono<ResponseEntity<CompanyDTO>> partialUpdateCompany(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody CompanyDTO companyDTO
-    ) throws URISyntaxException {
+    ) {
+        try{
         log.debug("REST request to partial update Company partially : {}, {}", id, companyDTO);
         if (companyDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -172,6 +184,10 @@ public class CompanyResource {
                             .body(res)
                     );
             });
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -213,9 +229,13 @@ public class CompanyResource {
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.SUPER_ADMIN + "\")")
     public Mono<ResponseEntity<CompanyDTO>> getCompany(@PathVariable Long id) {
-        log.debug("REST request to get Company : {}", id);
+      try{  log.debug("REST request to get Company : {}", id);
         Mono<CompanyDTO> companyDTO = companyService.findOne(id);
         return ResponseUtil.wrapOrNotFound(companyDTO);
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessNotFoundException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -242,7 +262,11 @@ public class CompanyResource {
 
     @GetMapping("/categories")
     public ResponseEntity<Flux<CategoryDTO>> findAllCategoryByCompany() {
-        log.debug("REST request to get categories:");
+    try {    log.debug("REST request to get categories:");
         return ResponseEntity.ok(productService.findAllCategoryByCompany());
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 }

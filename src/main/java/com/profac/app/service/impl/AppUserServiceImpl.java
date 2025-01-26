@@ -122,7 +122,6 @@ public class AppUserServiceImpl implements AppUserService {
         log.debug("Request to get all AppUsers");
         return appUserRepository.findAllBy(pageable).map(appUserMapper::toDto);
     }
-
     public Mono<Long> countAll() {
         return appUserRepository.count();
     }
@@ -136,8 +135,8 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     @Transactional(readOnly = true)
     public Mono<AppUserDTO> findByPhoneNumber(String phone) {
-        log.debug("Request to get AppUser : {}", phone);
-        return appUserRepository.findByPhoneNumber(phone).map(appUserMapper::toDto);
+        return appUserRepository.findByPhoneNumber(phone)
+            .flatMap(appUser -> findOne(appUser.getId()));
     }
 
     @Override

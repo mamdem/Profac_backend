@@ -3,6 +3,7 @@ package com.profac.app.web.rest;
 import com.profac.app.repository.InvoiceProductRepository;
 import com.profac.app.service.InvoiceProductService;
 import com.profac.app.service.dto.InvoiceProductDTO;
+import com.profac.app.utils.exception.BusinessBadRequestException;
 import com.profac.app.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -60,8 +61,8 @@ public class InvoiceProductResource {
      */
     @PostMapping("")
     public Mono<ResponseEntity<InvoiceProductDTO>> createInvoiceProduct(@Valid @RequestBody InvoiceProductDTO invoiceProductDTO)
-        throws URISyntaxException {
-        log.debug("REST request to save InvoiceProduct : {}", invoiceProductDTO);
+  {
+       try{ log.debug("REST request to save InvoiceProduct : {}", invoiceProductDTO);
         if (invoiceProductDTO.getId() != null) {
             throw new BadRequestAlertException("A new invoiceProduct cannot already have an ID", ENTITY_NAME, "idexists");
         }
@@ -77,6 +78,10 @@ public class InvoiceProductResource {
                     throw new RuntimeException(e);
                 }
             });
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -94,7 +99,9 @@ public class InvoiceProductResource {
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody InvoiceProductDTO invoiceProductDTO
     ) throws URISyntaxException {
-        log.debug("REST request to update InvoiceProduct : {}, {}", id, invoiceProductDTO);
+        try{
+            log.debug("REST request to update InvoiceProduct : {}, {}", id, invoiceProductDTO);
+
         if (invoiceProductDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -119,6 +126,10 @@ public class InvoiceProductResource {
                             .body(result)
                     );
             });
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
+        }
     }
 
     /**
@@ -137,7 +148,9 @@ public class InvoiceProductResource {
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody InvoiceProductDTO invoiceProductDTO
     ) throws URISyntaxException {
-        log.debug("REST request to partial update InvoiceProduct partially : {}, {}", id, invoiceProductDTO);
+       try {
+           log.debug("REST request to partial update InvoiceProduct partially : {}, {}", id, invoiceProductDTO);
+
         if (invoiceProductDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
         }
@@ -163,6 +176,10 @@ public class InvoiceProductResource {
                             .body(res)
                     );
             });
+       } catch (Exception e) {
+           log.error("Une erreur s'est produite: {}", e.getMessage());
+           throw new BusinessBadRequestException("Une erreur s'est produite");
+       }
     }
 
     /**
@@ -177,7 +194,9 @@ public class InvoiceProductResource {
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
-        log.debug("REST request to get a page of InvoiceProducts");
+      try {
+          log.debug("REST request to get a page of InvoiceProducts");
+
         return invoiceProductService
             .countAll()
             .zipWith(invoiceProductService.findAll(pageable).collectList())
@@ -192,15 +211,23 @@ public class InvoiceProductResource {
                     )
                     .body(countWithEntities.getT2())
             );
+      } catch (Exception e) {
+          log.error("Une erreur s'est produite: {}", e.getMessage());
+          throw new BusinessBadRequestException("Une erreur s'est produite");
+      }
     }
     @GetMapping(value = "/all", produces = MediaType.APPLICATION_JSON_VALUE)
     public Flux<InvoiceProductDTO> findAllInvoiceProducts(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
     ) {
-        log.debug("REST request to get a page of InvoiceProducts");
+       try{ log.debug("REST request to get a page of InvoiceProducts");
         return invoiceProductService
             .findAll(pageable);
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -211,9 +238,13 @@ public class InvoiceProductResource {
      */
     @GetMapping("/{id}")
     public Mono<ResponseEntity<InvoiceProductDTO>> getInvoiceProduct(@PathVariable Long id) {
-        log.debug("REST request to get InvoiceProduct : {}", id);
+      try{  log.debug("REST request to get InvoiceProduct : {}", id);
         Mono<InvoiceProductDTO> invoiceProductDTO = invoiceProductService.findOne(id);
         return ResponseUtil.wrapOrNotFound(invoiceProductDTO);
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 
     /**
@@ -225,7 +256,7 @@ public class InvoiceProductResource {
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> deleteInvoiceProduct(@PathVariable Long id) {
         log.debug("REST request to delete InvoiceProduct : {}", id);
-        return invoiceProductService
+        try{return invoiceProductService
             .delete(id)
             .then(
                 Mono.just(
@@ -235,5 +266,9 @@ public class InvoiceProductResource {
                         .build()
                 )
             );
+    } catch (Exception e) {
+        log.error("Une erreur s'est produite: {}", e.getMessage());
+        throw new BusinessBadRequestException("Une erreur s'est produite");
+    }
     }
 }

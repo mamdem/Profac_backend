@@ -15,6 +15,7 @@ import com.profac.app.service.dto.ProductDTO;
 import com.profac.app.service.dto.StockDTO;
 import com.profac.app.service.mapper.StockMapper;
 import com.profac.app.utils.encoder.Base64Encoder;
+import com.profac.app.utils.exception.BusinessBadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -35,13 +36,11 @@ import java.util.Set;
 public class StockServiceImpl implements StockService {
 
     private final Logger log = LoggerFactory.getLogger(StockServiceImpl.class);
-
     private final StockRepository stockRepository;
-
     private final StockMapper stockMapper;
     private final ProductService productService;
     private final ImageService imageService;
-private final CompanyService companyService;
+    private final CompanyService companyService;
     public StockServiceImpl(StockRepository stockRepository, StockMapper stockMapper, ProductService productService, ImageService imageService, CompanyService companyService) {
         this.stockRepository = stockRepository;
         this.stockMapper = stockMapper;
@@ -53,37 +52,42 @@ private final CompanyService companyService;
     @Override
     @Transactional
     public Mono<StockDTO> save(StockDTO stockDTO, FilePart image) {
-        log.debug("Request to save Stock : {}", stockDTO);
-        ProductDTO product = stockDTO.getProduct();
-        stockDTO.setRemainingQuantity(stockDTO.getInitialQuantity());
-        stockDTO.setStatus(StockStatus.ACTIVE);
-        stockDTO.setTotalAmount(product.getAmount().multiply(BigDecimal.valueOf(stockDTO.getInitialQuantity())));
-        stockDTO.setTotalAmountSold(BigDecimal.ZERO);
-        return stockDTO.initAuditFields()
-            .then(productService.save(product))
-            .doOnNext(s -> log.error("saved: {}", s))
-            .flatMap(productDTO -> {
-                ImageDTO imageDTO = new ImageDTO();
-                return Base64Encoder.encodeFileToBase64Binary(image)
-                    .map(encodedImage -> {
-                        imageDTO.setUrl(encodedImage);
-                        imageDTO.setProduct(productDTO);
-                        return imageDTO;
-                    })
-                    .flatMap(imageService::save)
-                    .thenReturn(productDTO);
-            })
-            .flatMap(savedProduct -> {
-                stockDTO.setProduct(savedProduct);
-                Stock stock = stockMapper.toEntity(stockDTO);
-                return SecurityUtils.getCurrentUserLogin()
-                    .flatMap(login -> companyService.findByPhoneNumber())
-                    .flatMap(company -> {
-                        stock.setCompany(company);
-                        return stockRepository.save(stock);
-                    })
-                    .map(stockMapper::toDto);
-            });
+        try{
+            log.debug("Request to save Stock : {}", stockDTO);
+            ProductDTO product = stockDTO.getProduct();
+            stockDTO.setRemainingQuantity(stockDTO.getInitialQuantity());
+            stockDTO.setStatus(StockStatus.ACTIVE);
+            stockDTO.setTotalAmount(product.getAmount().multiply(BigDecimal.valueOf(stockDTO.getInitialQuantity())));
+            stockDTO.setTotalAmountSold(BigDecimal.ZERO);
+            return stockDTO.initAuditFields()
+                .then(productService.save(product))
+                .doOnNext(s -> log.error("saved: {}", s))
+                .flatMap(productDTO -> {
+                    ImageDTO imageDTO = new ImageDTO();
+                    return Base64Encoder.encodeFileToBase64Binary(image)
+                        .map(encodedImage -> {
+                            imageDTO.setUrl(encodedImage);
+                            imageDTO.setProduct(productDTO);
+                            return imageDTO;
+                        })
+                        .flatMap(imageService::save)
+                        .thenReturn(productDTO);
+                })
+                .flatMap(savedProduct -> {
+                    stockDTO.setProduct(savedProduct);
+                    Stock stock = stockMapper.toEntity(stockDTO);
+                    return SecurityUtils.getCurrentUserLogin()
+                        .flatMap(login -> companyService.findByPhoneNumber())
+                        .flatMap(company -> {
+                            stock.setCompany(company);
+                            return stockRepository.save(stock);
+                        })
+                        .map(stockMapper::toDto);
+                });
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
+        }
     }
 
 
@@ -110,29 +114,34 @@ private final CompanyService companyService;
 
     @Transactional(readOnly = true)
     public Flux<StockDTO> findAll(int page, int size) {
-        int offset = page * size;
-        log.debug("Request to get all Stocks");
-        return companyService.findByPhoneNumber()
-            .flatMapMany(c -> stockRepository
-                .findAllByCompanyId(c.getId(), size, offset)
-                .flatMap(stock ->
-                    Mono.zip(
-                        Mono.just(stock),
-                        companyService.findOne(stock.getCompanyId()),
-                        productService.findOne(stock.getProductId())
+        try{
+            int offset = page * size;
+            log.debug("Request to get all Stocks");
+            return companyService.findByPhoneNumber()
+                .flatMapMany(c -> stockRepository
+                    .findAllByCompanyId(c.getId(), size, offset)
+                    .flatMap(stock ->
+                        Mono.zip(
+                            Mono.just(stock),
+                            companyService.findOne(stock.getCompanyId()),
+                            productService.findOne(stock.getProductId())
+                        )
                     )
-                )
-                .map(tuple -> {
-                    Stock stock = tuple.getT1();
-                    CompanyDTO company = tuple.getT2();
-                    ProductDTO product = tuple.getT3();
+                    .map(tuple -> {
+                        Stock stock = tuple.getT1();
+                        CompanyDTO company = tuple.getT2();
+                        ProductDTO product = tuple.getT3();
 
-                    StockDTO stockDTO = stockMapper.toDto(stock);
-                    stockDTO.setCompany(company);
-                    stockDTO.setProduct(product);
+                        StockDTO stockDTO = stockMapper.toDto(stock);
+                        stockDTO.setCompany(company);
+                        stockDTO.setProduct(product);
 
-                    return stockDTO;
-                }));
+                        return stockDTO;
+                    }));
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
+        }
     }
 
 
@@ -154,7 +163,8 @@ private final CompanyService companyService;
     }
     @Override
     public Mono<Void> updateStock(Product product, int quantity) {
-        return stockRepository.findByProductIdAndStatus(product.getId(), StockStatus.ACTIVE)
+        try {
+            return stockRepository.findByProductIdAndStatus(product.getId(), StockStatus.ACTIVE)
                 .flatMap(stock -> {
                     BigDecimal invoiceTotalAmount = product.getAmount().multiply(BigDecimal.valueOf(quantity));
                     Integer remainingQuantity = stock.getRemainingQuantity();
@@ -162,7 +172,10 @@ private final CompanyService companyService;
                     stock.setTotalAmountSold(stock.getTotalAmountSold().add(invoiceTotalAmount));
                     return partialUpdate(stockMapper.toDto(stock));
                 })
-            .then();
+                .then();
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
+        }
     }
-
 }

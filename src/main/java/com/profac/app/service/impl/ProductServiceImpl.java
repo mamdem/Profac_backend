@@ -58,38 +58,42 @@ public class ProductServiceImpl implements ProductService {
     @Override
     @Transactional
     public Mono<ProductDTO> save(ProductDTO productDTO) {
-        log.debug("Request to save Product : {}", productDTO);
+        try{  log.debug("Request to save Product : {}", productDTO);
 
-        CategoryDTO category = productDTO.getCategory();
-        if (category == null) throw new BusinessBadRequestException("Category cannot be null");
+            CategoryDTO category = productDTO.getCategory();
+            if (category == null) throw new BusinessBadRequestException("Category cannot be null");
 
-        String name = category.getName();
-        Mono<CategoryDTO> categoryMono = categoryService.findByName(name)
-            .switchIfEmpty(Mono.defer(() -> {
-                category.setName(name);
-                category.setStatus(CategoryStatus.ACTIVE);
-                Category entity = categoryMapper.toEntity(category);
-                return entity.initAuditFields().then(categoryService.save(entity));
-            }));
+            String name = category.getName();
+            Mono<CategoryDTO> categoryMono = categoryService.findByName(name)
+                .switchIfEmpty(Mono.defer(() -> {
+                    category.setName(name);
+                    category.setStatus(CategoryStatus.ACTIVE);
+                    Category entity = categoryMapper.toEntity(category);
+                    return entity.initAuditFields().then(categoryService.save(entity));
+                }));
 
-        return categoryMono.flatMap(existingCategory -> {
-            productDTO.setCategory(existingCategory);
-            productDTO.setStatus(ProductStatus.ACTIVE);
+            return categoryMono.flatMap(existingCategory -> {
+                productDTO.setCategory(existingCategory);
+                productDTO.setStatus(ProductStatus.ACTIVE);
 
-            Product product = productMapper.toEntity(productDTO);
+                Product product = productMapper.toEntity(productDTO);
 
-            return product.initAuditFields().then(Mono.defer(() ->
-                productRepository.count()
-                    .map(count -> {
-                        product.setProductNumber(initialProductNumber + count.intValue());
-                        return product;
-                    })
-                    .flatMap(productRepository::save)
-                    .map(productMapper::toDto)
-                    .doOnSuccess(dto -> log.debug("Saved Product: {}", dto))
-                    .doOnError(error -> log.error("Error saving product", error))
-            ));
-        });
+                return product.initAuditFields().then(Mono.defer(() ->
+                    productRepository.count()
+                        .map(count -> {
+                            product.setProductNumber(initialProductNumber + count.intValue());
+                            return product;
+                        })
+                        .flatMap(productRepository::save)
+                        .map(productMapper::toDto)
+                        .doOnSuccess(dto -> log.debug("Saved Product: {}", dto))
+                        .doOnError(error -> log.error("Error saving product", error))
+                ));
+            });
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
+        }
     }
 
     @Override

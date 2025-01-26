@@ -26,6 +26,9 @@
             <column name="password" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
+            <column name="phone_number" type="varchar(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_company__phone_number" />
+            </column>
             <column name="created_by" type="varchar(50)"/>
             <column name="created_date" type="timestamp"/>
             <column name="last_modified_by" type="varchar(50)"/>
@@ -56,6 +59,7 @@
             <column name="valid_until" type="date"/>
             <column name="status" type="string"/>
             <column name="password" type="string"/>
+            <column name="phone_number" type="string"/>
             <!-- jhipster-needle-liquibase-add-loadcolumn - JHipster (and/or extensions) can add load columns here -->
         </loadData>
     </changeSet>

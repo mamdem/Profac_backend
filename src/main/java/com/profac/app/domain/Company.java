@@ -38,13 +38,21 @@ public class Company extends AbstractAuditingEntity<Long> implements Serializabl
     @Column("password")
     private String password;
 
+    @NotNull(message = "must not be null")
+    @Column("phone_number")
+    private String phoneNumber;
+
     @Transient
     @JsonIgnoreProperties(value = { "avatar", "company" }, allowSetters = true)
     private Set<AppUser> appUsers = new HashSet<>();
 
     @Transient
-    @JsonIgnoreProperties(value = { "stocks", "images", "category", "company", "invoices" }, allowSetters = true)
-    private Set<Product> products = new HashSet<>();
+    @JsonIgnoreProperties(value = { "company", "invoiceProducts" }, allowSetters = true)
+    private Set<Invoice> invoices = new HashSet<>();
+
+    @Transient
+    @JsonIgnoreProperties(value = { "company", "product" }, allowSetters = true)
+    private Set<Stock> stocks = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -113,6 +121,19 @@ public class Company extends AbstractAuditingEntity<Long> implements Serializabl
         this.password = password;
     }
 
+    public String getPhoneNumber() {
+        return this.phoneNumber;
+    }
+
+    public Company phoneNumber(String phoneNumber) {
+        this.setPhoneNumber(phoneNumber);
+        return this;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     public Set<AppUser> getAppUsers() {
         return this.appUsers;
     }
@@ -144,34 +165,65 @@ public class Company extends AbstractAuditingEntity<Long> implements Serializabl
         return this;
     }
 
-    public Set<Product> getProducts() {
-        return this.products;
+    public Set<Invoice> getInvoices() {
+        return this.invoices;
     }
 
-    public void setProducts(Set<Product> products) {
-        if (this.products != null) {
-            this.products.forEach(i -> i.setCompany(null));
+    public void setInvoices(Set<Invoice> invoices) {
+        if (this.invoices != null) {
+            this.invoices.forEach(i -> i.setCompany(null));
         }
-        if (products != null) {
-            products.forEach(i -> i.setCompany(this));
+        if (invoices != null) {
+            invoices.forEach(i -> i.setCompany(this));
         }
-        this.products = products;
+        this.invoices = invoices;
     }
 
-    public Company products(Set<Product> products) {
-        this.setProducts(products);
+    public Company invoices(Set<Invoice> invoices) {
+        this.setInvoices(invoices);
         return this;
     }
 
-    public Company addProducts(Product product) {
-        this.products.add(product);
-        product.setCompany(this);
+    public Company addInvoices(Invoice invoice) {
+        this.invoices.add(invoice);
+        invoice.setCompany(this);
         return this;
     }
 
-    public Company removeProducts(Product product) {
-        this.products.remove(product);
-        product.setCompany(null);
+    public Company removeInvoices(Invoice invoice) {
+        this.invoices.remove(invoice);
+        invoice.setCompany(null);
+        return this;
+    }
+
+    public Set<Stock> getStocks() {
+        return this.stocks;
+    }
+
+    public void setStocks(Set<Stock> stocks) {
+        if (this.stocks != null) {
+            this.stocks.forEach(i -> i.setCompany(null));
+        }
+        if (stocks != null) {
+            stocks.forEach(i -> i.setCompany(this));
+        }
+        this.stocks = stocks;
+    }
+
+    public Company stocks(Set<Stock> stocks) {
+        this.setStocks(stocks);
+        return this;
+    }
+
+    public Company addStocks(Stock stock) {
+        this.stocks.add(stock);
+        stock.setCompany(this);
+        return this;
+    }
+
+    public Company removeStocks(Stock stock) {
+        this.stocks.remove(stock);
+        stock.setCompany(null);
         return this;
     }
 
@@ -203,6 +255,7 @@ public class Company extends AbstractAuditingEntity<Long> implements Serializabl
             ", validUntil='" + getValidUntil() + "'" +
             ", status='" + getStatus() + "'" +
             ", password='" + getPassword() + "'" +
+            ", phoneNumber='" + getPhoneNumber() + "'" +
             "}";
     }
 }

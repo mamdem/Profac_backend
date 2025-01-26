@@ -17,6 +17,7 @@ public class StockSqlHelper {
         columns.add(Column.aliased("remaining_quantity", table, columnPrefix + "_remaining_quantity"));
         columns.add(Column.aliased("status", table, columnPrefix + "_status"));
 
+        columns.add(Column.aliased("company_id", table, columnPrefix + "_company_id"));
         columns.add(Column.aliased("product_id", table, columnPrefix + "_product_id"));
         return columns;
     }

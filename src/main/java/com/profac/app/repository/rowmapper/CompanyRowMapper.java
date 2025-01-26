@@ -31,6 +31,7 @@ public class CompanyRowMapper implements BiFunction<Row, String, Company> {
         entity.setValidUntil(converter.fromRow(row, prefix + "_valid_until", Instant.class));
         entity.setStatus(converter.fromRow(row, prefix + "_status", CompanyStatus.class));
         entity.setPassword(converter.fromRow(row, prefix + "_password", String.class));
+        entity.setPhoneNumber(converter.fromRow(row, prefix + "_phone_number", String.class));
         return entity;
     }
 }

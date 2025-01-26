@@ -16,16 +16,11 @@ public class StockDTO extends AbstractAuditingEntity<Long> implements Serializab
     private Long id;
 
     private BigDecimal totalAmount;
-
     private BigDecimal totalAmountSold;
-
-    @NotNull(message = "must not be null")
     private Integer initialQuantity;
-
     private Integer remainingQuantity;
-
     private StockStatus status;
-
+    private CompanyDTO company;
     private ProductDTO product;
 
     public Long getId() {
@@ -76,6 +71,14 @@ public class StockDTO extends AbstractAuditingEntity<Long> implements Serializab
         this.status = status;
     }
 
+    public CompanyDTO getCompany() {
+        return company;
+    }
+
+    public void setCompany(CompanyDTO company) {
+        this.company = company;
+    }
+
     public ProductDTO getProduct() {
         return product;
     }
@@ -115,6 +118,7 @@ public class StockDTO extends AbstractAuditingEntity<Long> implements Serializab
             ", initialQuantity=" + getInitialQuantity() +
             ", remainingQuantity=" + getRemainingQuantity() +
             ", status='" + getStatus() + "'" +
+            ", company=" + getCompany() +
             ", product=" + getProduct() +
             "}";
     }

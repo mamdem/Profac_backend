@@ -17,10 +17,6 @@
       "fieldType": "String"
     },
     {
-      "fieldName": "quantity",
-      "fieldType": "Integer"
-    },
-    {
       "fieldName": "status",
       "fieldType": "InvoiceStatus",
       "fieldValues": "PENDING,PAID,UNPAID"
@@ -29,14 +25,7 @@
   "microserviceName": "core",
   "name": "Invoice",
   "pagination": "pagination",
-  "relationships": [
-    {
-      "otherEntityName": "product",
-      "relationshipName": "products",
-      "relationshipSide": "left",
-      "relationshipType": "many-to-many"
-    }
-  ],
+  "relationships": [],
   "searchEngine": "no",
   "service": "serviceImpl"
 }

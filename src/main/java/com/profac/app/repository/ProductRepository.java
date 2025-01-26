@@ -2,6 +2,7 @@ package com.profac.app.repository;
 
 import com.profac.app.domain.Company;
 import com.profac.app.domain.Product;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -23,13 +24,14 @@ public interface ProductRepository extends ReactiveCrudRepository<Product, Long>
     @Query("SELECT * FROM product entity WHERE entity.category_id IS NULL")
     Flux<Product> findAllWhereCategoryIsNull();
 
+
     @Override
     <S extends Product> Mono<S> save(S entity);
 
     @Override
     Flux<Product> findAll();
-    Flux<Product> findAllByCompanyId(Long id,Pageable pageable);
-    Flux<Product> findAllByCompanyId(Long id);
+
+    Mono<Product> findByProductNumber(Integer number);
 
     @Override
     Mono<Product> findById(Long id);

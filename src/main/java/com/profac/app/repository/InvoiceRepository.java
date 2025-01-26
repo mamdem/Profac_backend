@@ -1,5 +1,6 @@
 package com.profac.app.repository;
 
+import com.profac.app.domain.Company;
 import com.profac.app.domain.Invoice;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;
@@ -16,19 +17,14 @@ import reactor.core.publisher.Mono;
 public interface InvoiceRepository extends ReactiveCrudRepository<Invoice, Long>, InvoiceRepositoryInternal {
     Flux<Invoice> findAllBy(Pageable pageable);
 
-    @Override
-    Mono<Invoice> findOneWithEagerRelationships(Long id);
+    @Query("SELECT * FROM invoice entity WHERE entity.company_id = :id  LIMIT :limit OFFSET :offset")
+    Flux<Invoice> findByCompany(Long id, int limit, int offset);
+    @Query("SELECT COUNT(*) FROM invoice WHERE company_id = :companyId")
+    Mono<Long> countByCompanyId(Long companyId);
+    Flux<Invoice> findByCompanyId(Long id, Pageable pageable);
 
-    @Override
-    Flux<Invoice> findAllWithEagerRelationships();
-
-    @Override
-    Flux<Invoice> findAllWithEagerRelationships(Pageable page);
-
-    @Query(
-        "SELECT entity.* FROM invoice entity JOIN rel_invoice__products joinTable ON entity.id = joinTable.products_id WHERE joinTable.products_id = :id"
-    )
-    Flux<Invoice> findByProducts(Long id);
+    @Query("SELECT * FROM invoice entity WHERE entity.company_id IS NULL")
+    Flux<Invoice> findAllWhereCompanyIsNull();
 
     @Override
     <S extends Invoice> Mono<S> save(S entity);
@@ -41,6 +37,9 @@ public interface InvoiceRepository extends ReactiveCrudRepository<Invoice, Long>
 
     @Override
     Mono<Void> deleteById(Long id);
+
+    Mono<Invoice> findByInvoiceNumber(Long invoiceNumber);
+
 }
 
 interface InvoiceRepositoryInternal {
@@ -53,12 +52,4 @@ interface InvoiceRepositoryInternal {
     Mono<Invoice> findById(Long id);
     // this is not supported at the moment because of https://github.com/jhipster/generator-jhipster/issues/18269
     // Flux<Invoice> findAllBy(Pageable pageable, Criteria criteria);
-
-    Mono<Invoice> findOneWithEagerRelationships(Long id);
-
-    Flux<Invoice> findAllWithEagerRelationships();
-
-    Flux<Invoice> findAllWithEagerRelationships(Pageable page);
-
-    Mono<Void> deleteById(Long id);
 }

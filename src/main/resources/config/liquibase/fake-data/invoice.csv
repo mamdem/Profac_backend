@@ -1,2 +1,2 @@
-id;invoice_number;customer;invoice_date;quantity;status
-1;17296;the and;buy revolt furthermore;26193;PAID
+id;invoice_number;customer;invoice_date;status
+1;17296;Lamine Ly;2024-05-01;PAID

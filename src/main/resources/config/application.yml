@@ -151,8 +151,7 @@ jhipster:
     name: 'profacApp'
   # By default CORS is disabled. Uncomment to enable.
   cors:
-    #allowed-origins: "http://localhost:8100,http://localhost:9000"
-    allowed-origins: 'http://localhost:8080,http://localhost:4200,http://localhost:8081'
+    allowed-origins: 'http://localhost:8080, http://127.0.0.1:8080, http://localhost:4200,http://localhost:8081'
     allowed-methods: "*"
     allowed-headers: "*"
     exposed-headers: "Authorization,Link,X-Total-Count,X-${jhipster.clientApp.name}-alert,X-${jhipster.clientApp.name}-error,X-${jhipster.clientApp.name}-params"
@@ -185,3 +184,4 @@ jhipster:
 # application:
 initial-number:
   product: 0392929
+  invoice: 0392323

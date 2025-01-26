@@ -1,6 +1,5 @@
 package com.profac.app.service.dto;
 
-import com.profac.app.domain.AbstractAuditingEntity;
 import com.profac.app.domain.enumeration.ProductStatus;
 import jakarta.persistence.Lob;
 import jakarta.validation.constraints.*;
@@ -12,20 +11,25 @@ import java.util.Objects;
  * A DTO for the {@link com.profac.app.domain.Product} entity.
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class ProductDTO extends AbstractAuditingEntity<Long> implements Serializable {
+public class ProductDTO implements Serializable {
+
     private Long id;
+
+    @NotNull(message = "must not be null")
     private Integer productNumber;
+
     @NotNull(message = "must not be null")
     private String name;
+
+    @NotNull(message = "must not be null")
     private BigDecimal amount;
+
     @Lob
     private String description;
 
     private ProductStatus status;
 
     private CategoryDTO category;
-
-    private CompanyDTO company;
 
     public Long getId() {
         return id;
@@ -83,14 +87,6 @@ public class ProductDTO extends AbstractAuditingEntity<Long> implements Serializ
         this.category = category;
     }
 
-    public CompanyDTO getCompany() {
-        return company;
-    }
-
-    public void setCompany(CompanyDTO company) {
-        this.company = company;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -123,7 +119,6 @@ public class ProductDTO extends AbstractAuditingEntity<Long> implements Serializ
             ", description='" + getDescription() + "'" +
             ", status='" + getStatus() + "'" +
             ", category=" + getCategory() +
-            ", company=" + getCompany() +
             "}";
     }
 }

@@ -1,6 +1,7 @@
 package com.profac.app.repository;
 
 import com.profac.app.domain.Stock;
+import com.profac.app.repository.rowmapper.CompanyRowMapper;
 import com.profac.app.repository.rowmapper.ProductRowMapper;
 import com.profac.app.repository.rowmapper.StockRowMapper;
 import io.r2dbc.spi.Row;
@@ -35,15 +36,18 @@ class StockRepositoryInternalImpl extends SimpleR2dbcRepository<Stock, Long> imp
     private final R2dbcEntityTemplate r2dbcEntityTemplate;
     private final EntityManager entityManager;
 
+    private final CompanyRowMapper companyMapper;
     private final ProductRowMapper productMapper;
     private final StockRowMapper stockMapper;
 
     private static final Table entityTable = Table.aliased("stock", EntityManager.ENTITY_ALIAS);
+    private static final Table companyTable = Table.aliased("company", "company");
     private static final Table productTable = Table.aliased("product", "product");
 
     public StockRepositoryInternalImpl(
         R2dbcEntityTemplate template,
         EntityManager entityManager,
+        CompanyRowMapper companyMapper,
         ProductRowMapper productMapper,
         StockRowMapper stockMapper,
         R2dbcEntityOperations entityOperations,
@@ -57,6 +61,7 @@ class StockRepositoryInternalImpl extends SimpleR2dbcRepository<Stock, Long> imp
         this.db = template.getDatabaseClient();
         this.r2dbcEntityTemplate = template;
         this.entityManager = entityManager;
+        this.companyMapper = companyMapper;
         this.productMapper = productMapper;
         this.stockMapper = stockMapper;
     }
@@ -68,11 +73,15 @@ class StockRepositoryInternalImpl extends SimpleR2dbcRepository<Stock, Long> imp
 
     RowsFetchSpec<Stock> createQuery(Pageable pageable, Condition whereClause) {
         List<Expression> columns = StockSqlHelper.getColumns(entityTable, EntityManager.ENTITY_ALIAS);
+        columns.addAll(CompanySqlHelper.getColumns(companyTable, "company"));
         columns.addAll(ProductSqlHelper.getColumns(productTable, "product"));
         SelectFromAndJoinCondition selectFrom = Select
             .builder()
             .select(columns)
             .from(entityTable)
+            .leftOuterJoin(companyTable)
+            .on(Column.create("company_id", entityTable))
+            .equals(Column.create("id", companyTable))
             .leftOuterJoin(productTable)
             .on(Column.create("product_id", entityTable))
             .equals(Column.create("id", productTable));
@@ -94,6 +103,7 @@ class StockRepositoryInternalImpl extends SimpleR2dbcRepository<Stock, Long> imp
 
     private Stock process(Row row, RowMetadata metadata) {
         Stock entity = stockMapper.apply(row, "e");
+        entity.setCompany(companyMapper.apply(row, "company"));
         entity.setProduct(productMapper.apply(row, "product"));
         return entity;
     }

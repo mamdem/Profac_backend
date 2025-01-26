@@ -1,5 +1,6 @@
 package com.profac.app.web.rest;
 
+import com.profac.app.domain.Category;
 import com.profac.app.repository.CategoryRepository;
 import com.profac.app.security.AuthoritiesConstants;
 import com.profac.app.service.CategoryService;
@@ -61,7 +62,7 @@ public class CategoryResource {
      */
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public Mono<ResponseEntity<CategoryDTO>> createCategory(@Valid @RequestBody CategoryDTO categoryDTO) throws URISyntaxException {
+    public Mono<ResponseEntity<CategoryDTO>> createCategory(@Valid @RequestBody Category categoryDTO) throws URISyntaxException {
         log.debug("REST request to save Category : {}", categoryDTO);
         if (categoryDTO.getId() != null) {
             throw new BadRequestAlertException("A new category cannot already have an ID", ENTITY_NAME, "idexists");

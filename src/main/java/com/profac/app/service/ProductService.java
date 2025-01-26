@@ -1,7 +1,9 @@
 package com.profac.app.service;
 
+import com.profac.app.domain.Product;
 import com.profac.app.service.dto.CategoryDTO;
 import com.profac.app.service.dto.ProductDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -44,9 +46,6 @@ public interface ProductService {
      */
     Flux<ProductDTO> findAll(Pageable pageable);
 
-
-    @Transactional(readOnly = true)
-    Flux<ProductDTO> findAllByCompany(Pageable pageable);
     Flux<CategoryDTO> findAllCategoryByCompany();
 
     /**
@@ -71,4 +70,6 @@ public interface ProductService {
      * @return a Mono to signal the deletion
      */
     Mono<Void> delete(Long id);
+
+    Mono<Product> findByProductNumber(Integer number);
 }

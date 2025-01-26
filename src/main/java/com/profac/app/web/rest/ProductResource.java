@@ -75,7 +75,6 @@ public class ProductResource {
             });
     }
 */
-
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public Mono<ResponseEntity<ProductDTO>> updateProduct(

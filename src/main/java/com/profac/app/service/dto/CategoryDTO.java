@@ -10,7 +10,7 @@ import java.util.Objects;
  * A DTO for the {@link com.profac.app.domain.Category} entity.
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class CategoryDTO extends AbstractAuditingEntity<Long> implements Serializable {
+public class CategoryDTO implements Serializable {
 
     private Long id;
 

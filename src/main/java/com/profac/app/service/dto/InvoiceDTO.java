@@ -12,7 +12,6 @@ import java.util.Set;
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class InvoiceDTO extends AbstractAuditingEntity<Long> implements Serializable {
-
     private Long id;
 
     private Long invoiceNumber;
@@ -21,11 +20,11 @@ public class InvoiceDTO extends AbstractAuditingEntity<Long> implements Serializ
 
     private String invoiceDate;
 
-    private Integer quantity;
-
     private InvoiceStatus status;
 
-    private Set<ProductDTO> products = new HashSet<>();
+    private CompanyDTO company;
+
+    private Set<ExposedInvoiceProductDTO> products = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -59,14 +58,6 @@ public class InvoiceDTO extends AbstractAuditingEntity<Long> implements Serializ
         this.invoiceDate = invoiceDate;
     }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
     public InvoiceStatus getStatus() {
         return status;
     }
@@ -75,12 +66,12 @@ public class InvoiceDTO extends AbstractAuditingEntity<Long> implements Serializ
         this.status = status;
     }
 
-    public Set<ProductDTO> getProducts() {
-        return products;
+    public CompanyDTO getCompany() {
+        return company;
     }
 
-    public void setProducts(Set<ProductDTO> products) {
-        this.products = products;
+    public void setCompany(CompanyDTO company) {
+        this.company = company;
     }
 
     @Override
@@ -104,17 +95,24 @@ public class InvoiceDTO extends AbstractAuditingEntity<Long> implements Serializ
         return Objects.hash(this.id);
     }
 
-    // prettier-ignore
+    public Set<ExposedInvoiceProductDTO> getProducts() {
+        return products;
+    }
+
+    public void setProducts(Set<ExposedInvoiceProductDTO> products) {
+        this.products = products;
+    }
+
     @Override
     public String toString() {
         return "InvoiceDTO{" +
-            "id=" + getId() +
-            ", invoiceNumber=" + getInvoiceNumber() +
-            ", customer='" + getCustomer() + "'" +
-            ", invoiceDate='" + getInvoiceDate() + "'" +
-            ", quantity=" + getQuantity() +
-            ", status='" + getStatus() + "'" +
-            ", products=" + getProducts() +
-            "}";
+            "id=" + id +
+            ", invoiceNumber=" + invoiceNumber +
+            ", customer='" + customer + '\'' +
+            ", invoiceDate='" + invoiceDate + '\'' +
+            ", status=" + status +
+            ", company=" + company +
+            ", products=" + products +
+            '}';
     }
 }

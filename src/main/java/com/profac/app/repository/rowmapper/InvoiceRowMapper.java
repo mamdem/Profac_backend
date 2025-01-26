@@ -29,8 +29,8 @@ public class InvoiceRowMapper implements BiFunction<Row, String, Invoice> {
         entity.setInvoiceNumber(converter.fromRow(row, prefix + "_invoice_number", Long.class));
         entity.setCustomer(converter.fromRow(row, prefix + "_customer", String.class));
         entity.setInvoiceDate(converter.fromRow(row, prefix + "_invoice_date", String.class));
-        entity.setQuantity(converter.fromRow(row, prefix + "_quantity", Integer.class));
         entity.setStatus(converter.fromRow(row, prefix + "_status", InvoiceStatus.class));
+        entity.setCompanyId(converter.fromRow(row, prefix + "_company_id", Long.class));
         return entity;
     }
 }

@@ -18,7 +18,6 @@ public class ProductSqlHelper {
         columns.add(Column.aliased("status", table, columnPrefix + "_status"));
 
         columns.add(Column.aliased("category_id", table, columnPrefix + "_category_id"));
-        columns.add(Column.aliased("company_id", table, columnPrefix + "_company_id"));
         return columns;
     }
 }

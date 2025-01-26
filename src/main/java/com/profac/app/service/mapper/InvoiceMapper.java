@@ -1,11 +1,9 @@
 package com.profac.app.service.mapper;
 
+import com.profac.app.domain.Company;
 import com.profac.app.domain.Invoice;
-import com.profac.app.domain.Product;
+import com.profac.app.service.dto.CompanyDTO;
 import com.profac.app.service.dto.InvoiceDTO;
-import com.profac.app.service.dto.ProductDTO;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.mapstruct.*;
 
 /**
@@ -13,19 +11,14 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface InvoiceMapper extends EntityMapper<InvoiceDTO, Invoice> {
-    @Mapping(target = "products", source = "products", qualifiedByName = "productIdSet")
+    @Mapping(target = "company", source = "company", qualifiedByName = "companyId")
     InvoiceDTO toDto(Invoice s);
 
-    @Mapping(target = "removeProducts", ignore = true)
-    Invoice toEntity(InvoiceDTO invoiceDTO);
-
-    @Named("productId")
+    @Named("companyId")
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "id", source = "id")
-    ProductDTO toDtoProductId(Product product);
-
-    @Named("productIdSet")
-    default Set<ProductDTO> toDtoProductIdSet(Set<Product> product) {
-        return product.stream().map(this::toDtoProductId).collect(Collectors.toSet());
-    }
+    @Mapping(target = "name", source = "name")
+    @Mapping(target = "validUntil", source = "validUntil")
+    @Mapping(target = "status", source = "status")
+    CompanyDTO toDtoCompanyId(Company company);
 }

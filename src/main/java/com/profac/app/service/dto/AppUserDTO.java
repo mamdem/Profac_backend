@@ -11,7 +11,7 @@ import java.util.Objects;
  * A DTO for the {@link com.profac.app.domain.AppUser} entity.
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class AppUserDTO extends AbstractAuditingEntity<Long> implements Serializable {
+public class AppUserDTO implements Serializable {
 
     private Long id;
 

@@ -40,7 +40,7 @@
     "services:up": "docker compose -f src/main/docker/services.yml up --wait"
   },
   "config": {
-    "backend_port": 8080,
+    "backend_port": 8089,
     "default_environment": "prod",
     "packaging": "jar"
   },

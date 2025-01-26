@@ -8,18 +8,11 @@
     -->
     <changeSet id="20240902094823-2" author="jhipster">
 
-        <addForeignKeyConstraint baseColumnNames="invoice_id"
-                                 baseTableName="rel_invoice__products"
-                                 constraintName="fk_rel_invoice__products__invoice_id"
+        <addForeignKeyConstraint baseColumnNames="company_id"
+                                 baseTableName="invoice"
+                                 constraintName="fk_invoice__company_id"
                                  referencedColumnNames="id"
-                                 referencedTableName="invoice"
-                                 />
-
-        <addForeignKeyConstraint baseColumnNames="products_id"
-                                 baseTableName="rel_invoice__products"
-                                 constraintName="fk_rel_invoice__products__products_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="product"
+                                 referencedTableName="company"
                                  />
     </changeSet>
 </databaseChangeLog>

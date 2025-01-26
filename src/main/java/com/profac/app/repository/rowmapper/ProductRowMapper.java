@@ -33,7 +33,6 @@ public class ProductRowMapper implements BiFunction<Row, String, Product> {
         entity.setDescription(converter.fromRow(row, prefix + "_description", String.class));
         entity.setStatus(converter.fromRow(row, prefix + "_status", ProductStatus.class));
         entity.setCategoryId(converter.fromRow(row, prefix + "_category_id", Long.class));
-        entity.setCompanyId(converter.fromRow(row, prefix + "_company_id", Long.class));
         return entity;
     }
 }

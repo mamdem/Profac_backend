@@ -1,5 +1,6 @@
 package com.profac.app.service;
 
+import com.profac.app.domain.Category;
 import com.profac.app.service.dto.CategoryDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,7 @@ public interface CategoryService {
      * @param categoryDTO the entity to save.
      * @return the persisted entity.
      */
-    Mono<CategoryDTO> save(CategoryDTO categoryDTO);
+    Mono<CategoryDTO> save(Category categoryDTO);
 
     /**
      * Updates a category.

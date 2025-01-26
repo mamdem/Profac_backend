@@ -9,7 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
-import jakarta.persistence.*;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
@@ -22,29 +22,29 @@ public class Product extends AbstractAuditingEntity<Long> implements Serializabl
     private static final long serialVersionUID = 1L;
 
     @Id
-    @Column(name = "id")
+    @Column("id")
     private Long id;
 
     @NotNull(message = "must not be null")
-    @Column(name = "product_number")
+    @Column("product_number")
     private Integer productNumber;
 
     @NotNull(message = "must not be null")
-    @Column(name = "name")
+    @Column("name")
     private String name;
 
     @NotNull(message = "must not be null")
-    @Column(name = "amount", precision = 21, scale = 2)
+    @Column("amount")
     private BigDecimal amount;
 
-    @Column(name = "description")
+    @Column("description")
     private String description;
 
-    @Column(name = "status")
+    @Column("status")
     private ProductStatus status;
 
     @Transient
-    @JsonIgnoreProperties(value = { "product" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "company", "product" }, allowSetters = true)
     private Set<Stock> stocks = new HashSet<>();
 
     @Transient
@@ -55,18 +55,11 @@ public class Product extends AbstractAuditingEntity<Long> implements Serializabl
     private Category category;
 
     @Transient
-    @JsonIgnoreProperties(value = { "appUsers", "products" }, allowSetters = true)
-    private Company company;
+    @JsonIgnoreProperties(value = { "invoice", "product" }, allowSetters = true)
+    private Set<InvoiceProduct> invoiceProducts = new HashSet<>();
 
-    @Transient
-    @JsonIgnoreProperties(value = { "products" }, allowSetters = true)
-    private Set<Invoice> invoices = new HashSet<>();
-
-    @Column(name = "category_id")
+    @Column("category_id")
     private Long categoryId;
-
-    @Column(name = "company_id")
-    private Long companyId;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -119,7 +112,7 @@ public class Product extends AbstractAuditingEntity<Long> implements Serializabl
     }
 
     public void setAmount(BigDecimal amount) {
-        this.amount = amount;
+        this.amount = amount != null ? amount.stripTrailingZeros() : null;
     }
 
     public String getDescription() {
@@ -224,48 +217,34 @@ public class Product extends AbstractAuditingEntity<Long> implements Serializabl
         return this;
     }
 
-    public Company getCompany() {
-        return this.company;
+    public Set<InvoiceProduct> getInvoiceProducts() {
+        return this.invoiceProducts;
     }
 
-    public void setCompany(Company company) {
-        this.company = company;
-        this.companyId = company != null ? company.getId() : null;
-    }
-
-    public Product company(Company company) {
-        this.setCompany(company);
-        return this;
-    }
-
-    public Set<Invoice> getInvoices() {
-        return this.invoices;
-    }
-
-    public void setInvoices(Set<Invoice> invoices) {
-        if (this.invoices != null) {
-            this.invoices.forEach(i -> i.removeProducts(this));
+    public void setInvoiceProducts(Set<InvoiceProduct> invoiceProducts) {
+        if (this.invoiceProducts != null) {
+            this.invoiceProducts.forEach(i -> i.setProduct(null));
         }
-        if (invoices != null) {
-            invoices.forEach(i -> i.addProducts(this));
+        if (invoiceProducts != null) {
+            invoiceProducts.forEach(i -> i.setProduct(this));
         }
-        this.invoices = invoices;
+        this.invoiceProducts = invoiceProducts;
     }
 
-    public Product invoices(Set<Invoice> invoices) {
-        this.setInvoices(invoices);
+    public Product invoiceProducts(Set<InvoiceProduct> invoiceProducts) {
+        this.setInvoiceProducts(invoiceProducts);
         return this;
     }
 
-    public Product addInvoice(Invoice invoice) {
-        this.invoices.add(invoice);
-        invoice.getProducts().add(this);
+    public Product addInvoiceProducts(InvoiceProduct invoiceProduct) {
+        this.invoiceProducts.add(invoiceProduct);
+        invoiceProduct.setProduct(this);
         return this;
     }
 
-    public Product removeInvoice(Invoice invoice) {
-        this.invoices.remove(invoice);
-        invoice.getProducts().remove(this);
+    public Product removeInvoiceProducts(InvoiceProduct invoiceProduct) {
+        this.invoiceProducts.remove(invoiceProduct);
+        invoiceProduct.setProduct(null);
         return this;
     }
 
@@ -275,14 +254,6 @@ public class Product extends AbstractAuditingEntity<Long> implements Serializabl
 
     public void setCategoryId(Long category) {
         this.categoryId = category;
-    }
-
-    public Long getCompanyId() {
-        return this.companyId;
-    }
-
-    public void setCompanyId(Long company) {
-        this.companyId = company;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

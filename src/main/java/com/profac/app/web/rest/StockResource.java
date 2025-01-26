@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -61,13 +62,13 @@ public class StockResource {
      */
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public Mono<ResponseEntity<StockDTO>> createStock(@Valid @RequestBody StockDTO stockDTO) throws URISyntaxException {
+    public Mono<ResponseEntity<StockDTO>> createStock(@Valid @ModelAttribute StockDTO stockDTO, @RequestPart("file") FilePart image) throws URISyntaxException {
         log.debug("REST request to save Stock : {}", stockDTO);
         if (stockDTO.getId() != null) {
             throw new BadRequestAlertException("A new stock cannot already have an ID", ENTITY_NAME, "idexists");
         }
         return stockService
-            .save(stockDTO)
+            .save(stockDTO, image)
             .map(result -> {
                 try {
                     return ResponseEntity
@@ -179,12 +180,14 @@ public class StockResource {
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public Mono<ResponseEntity<List<StockDTO>>> getAllStocks(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        ServerHttpRequest request
+        ServerHttpRequest request,
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
     ) {
         log.debug("REST request to get a page of Stocks");
         return stockService
             .countAll()
-            .zipWith(stockService.findAll(pageable).collectList())
+            .zipWith(stockService.findAll(page, size).collectList())
             .map(countWithEntities ->
                 ResponseEntity
                     .ok()

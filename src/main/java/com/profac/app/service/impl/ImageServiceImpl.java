@@ -1,5 +1,6 @@
 package com.profac.app.service.impl;
 
+import com.profac.app.domain.enumeration.ImageStatus;
 import com.profac.app.repository.ImageRepository;
 import com.profac.app.service.ImageService;
 import com.profac.app.service.dto.ImageDTO;
@@ -33,6 +34,7 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public Mono<ImageDTO> save(ImageDTO imageDTO) {
         log.debug("Request to save Image : {}", imageDTO);
+        imageDTO.setStatus(ImageStatus.ACTIVE);
         return imageRepository.save(imageMapper.toEntity(imageDTO)).map(imageMapper::toDto);
     }
 

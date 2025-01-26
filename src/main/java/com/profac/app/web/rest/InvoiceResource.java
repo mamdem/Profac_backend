@@ -1,8 +1,11 @@
 package com.profac.app.web.rest;
 
 import com.profac.app.repository.InvoiceRepository;
+import com.profac.app.security.AuthoritiesConstants;
 import com.profac.app.service.InvoiceService;
 import com.profac.app.service.dto.InvoiceDTO;
+import com.profac.app.service.dto.InvoiceResponseDTO;
+import com.profac.app.service.dto.ProductDTO;
 import com.profac.app.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -11,12 +14,14 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -56,6 +61,7 @@ public class InvoiceResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<InvoiceDTO>> createInvoice(@RequestBody InvoiceDTO invoiceDTO) throws URISyntaxException {
         log.debug("REST request to save Invoice : {}", invoiceDTO);
         if (invoiceDTO.getId() != null) {
@@ -86,6 +92,7 @@ public class InvoiceResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<InvoiceDTO>> updateInvoice(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody InvoiceDTO invoiceDTO
@@ -129,6 +136,7 @@ public class InvoiceResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<InvoiceDTO>> partialUpdateInvoice(
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody InvoiceDTO invoiceDTO
@@ -161,35 +169,15 @@ public class InvoiceResource {
             });
     }
 
-    /**
-     * {@code GET  /invoices} : get all the invoices.
-     *
-     * @param pageable the pagination information.
-     * @param request a {@link ServerHttpRequest} request.
-     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of invoices in body.
-     */
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<ResponseEntity<List<InvoiceDTO>>> getAllInvoices(
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        ServerHttpRequest request,
-        @RequestParam(required = false, defaultValue = "true") boolean eagerload
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
+    public Mono<ResponseEntity<Page<InvoiceResponseDTO>>> getAllInvoices(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size
     ) {
         log.debug("REST request to get a page of Invoices");
-        return invoiceService
-            .countAll()
-            .zipWith(invoiceService.findAll(pageable).collectList())
-            .map(countWithEntities ->
-                ResponseEntity
-                    .ok()
-                    .headers(
-                        PaginationUtil.generatePaginationHttpHeaders(
-                            UriComponentsBuilder.fromHttpRequest(request),
-                            new PageImpl<>(countWithEntities.getT2(), pageable, countWithEntities.getT1())
-                        )
-                    )
-                    .body(countWithEntities.getT2())
-            );
+        return invoiceService.findAll(page, size)
+            .map(ResponseEntity::ok); // Wrap the result in a ResponseEntity
     }
 
     /**
@@ -199,6 +187,7 @@ public class InvoiceResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the invoiceDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<InvoiceDTO>> getInvoice(@PathVariable Long id) {
         log.debug("REST request to get Invoice : {}", id);
         Mono<InvoiceDTO> invoiceDTO = invoiceService.findOne(id);
@@ -212,6 +201,7 @@ public class InvoiceResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<Void>> deleteInvoice(@PathVariable Long id) {
         log.debug("REST request to delete Invoice : {}", id);
         return invoiceService

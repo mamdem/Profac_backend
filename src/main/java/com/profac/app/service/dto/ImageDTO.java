@@ -10,7 +10,7 @@ import java.util.Objects;
  * A DTO for the {@link com.profac.app.domain.Image} entity.
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class ImageDTO extends AbstractAuditingEntity<Long> implements Serializable {
+public class ImageDTO  implements Serializable {
 
     private Long id;
 

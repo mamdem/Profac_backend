@@ -57,11 +57,10 @@ public class AppUserResource {
      *
      * @param appUserDTO the appUserDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new appUserDTO, or with status {@code 400 (Bad Request)} if the appUser has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
     @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
-    public Mono<ResponseEntity<AppUserDTO>> createAppUser(@Valid @RequestBody AppUserDTO appUserDTO) throws URISyntaxException {
+    public Mono<ResponseEntity<AppUserDTO>> createAppUser(@Valid @RequestBody AppUserDTO appUserDTO) {
         log.debug("REST request to save AppUser : {}", appUserDTO);
         if (appUserDTO.getId() != null) {
             throw new BadRequestAlertException("A new appUser cannot already have an ID", ENTITY_NAME, "idexists");

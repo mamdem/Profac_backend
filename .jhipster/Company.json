@@ -21,6 +21,11 @@
     {
       "fieldName": "password",
       "fieldType": "String"
+    },
+    {
+      "fieldName": "phoneNumber",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
     }
   ],
   "microserviceName": "core",
@@ -35,9 +40,17 @@
     },
     {
       "otherEntityField": "id",
-      "otherEntityName": "product",
+      "otherEntityName": "invoice",
       "otherEntityRelationshipName": "company",
-      "relationshipName": "products",
+      "relationshipName": "invoices",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityField": "id",
+      "otherEntityName": "stock",
+      "otherEntityRelationshipName": "company",
+      "relationshipName": "stocks",
       "relationshipSide": "left",
       "relationshipType": "one-to-many"
     }

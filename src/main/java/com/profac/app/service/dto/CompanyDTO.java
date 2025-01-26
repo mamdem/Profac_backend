@@ -1,6 +1,6 @@
 package com.profac.app.service.dto;
 
-import com.profac.app.domain.AbstractAuditingEntity;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.profac.app.domain.enumeration.CompanyStatus;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -11,7 +11,7 @@ import java.util.Objects;
  * A DTO for the {@link com.profac.app.domain.Company} entity.
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class CompanyDTO extends AbstractAuditingEntity<Long> implements Serializable {
+public class CompanyDTO implements Serializable {
 
     private Long id;
 
@@ -21,8 +21,11 @@ public class CompanyDTO extends AbstractAuditingEntity<Long> implements Serializ
     private Instant validUntil;
 
     private CompanyStatus status;
-
+    @JsonIgnoreProperties
     private String password;
+
+    @NotNull(message = "must not be null")
+    private String phoneNumber;
 
     public Long getId() {
         return id;
@@ -64,6 +67,14 @@ public class CompanyDTO extends AbstractAuditingEntity<Long> implements Serializ
         this.password = password;
     }
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -94,6 +105,7 @@ public class CompanyDTO extends AbstractAuditingEntity<Long> implements Serializ
             ", validUntil='" + getValidUntil() + "'" +
             ", status='" + getStatus() + "'" +
             ", password='" + getPassword() + "'" +
+            ", phoneNumber='" + getPhoneNumber() + "'" +
             "}";
     }
 }

@@ -1,6 +1,8 @@
 package com.profac.app.repository;
 
+import com.profac.app.domain.Product;
 import com.profac.app.domain.Stock;
+import com.profac.app.domain.enumeration.StockStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
@@ -21,6 +23,12 @@ public interface StockRepository extends ReactiveCrudRepository<Stock, Long>, St
 
     @Query("SELECT * FROM stock entity WHERE entity.product_id IS NULL")
     Flux<Stock> findAllWhereProductIsNull();
+    @Query("SELECT s.*, c.*, p.* FROM Stock s " +
+        "JOIN Company c ON s.company_id = c.id " +
+        "JOIN Product p ON s.product_id = p.id " +
+        "WHERE c.id = :companyId LIMIT :limit OFFSET :offset")
+    Flux<Stock> findAllByCompanyId(Long companyId, int limit, int offset);
+    Flux<Stock> findAllByCompanyId(Long id);
 
     @Override
     <S extends Stock> Mono<S> save(S entity);
@@ -30,6 +38,7 @@ public interface StockRepository extends ReactiveCrudRepository<Stock, Long>, St
 
     @Override
     Mono<Stock> findById(Long id);
+    Mono<Stock> findByProductIdAndStatus(Long productId, StockStatus status);
 
     @Override
     Mono<Void> deleteById(Long id);

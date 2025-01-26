@@ -13,6 +13,7 @@ import com.profac.app.service.dto.AdminUserDTO;
 import com.profac.app.service.dto.AppUserDTO;
 import com.profac.app.service.mapper.AppUserMapper;
 import com.profac.app.utils.exception.BusinessBadRequestException;
+import com.profac.app.utils.exception.BusinessNotFoundException;
 import com.profac.app.web.rest.UserResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +58,7 @@ public class AppUserServiceImpl implements AppUserService {
         Set<UserType> validTypes = Set.of(UserType.CASHIER, UserType.SELLER);
         if (!validTypes.contains(userType)) {
             log.error("User type not found");
-            throw new BusinessBadRequestException("User type not found");
+            throw new BusinessBadRequestException("User type not found: {}", userType.name());
         }
         String role = userType.equals(UserType.CASHIER) ? "ROLE_CASHIER" : "ROLE_SELLER";
         List<String> authorityNames = List.of(role);
@@ -74,9 +75,11 @@ public class AppUserServiceImpl implements AppUserService {
         adminUserDTO.setPassword(appUser.getPassword());
         return SecurityUtils.getCurrentUserLogin()
             .flatMap(userLogin -> {
+                log.debug("Logged user: {}", userLogin);
                 appUser.setCreatedBy(userLogin);
                 appUser.setLastModifiedBy(userLogin);
-                return companyRepository.findByName(userLogin)
+                return companyRepository.findByPhoneNumber(userLogin)
+                    .switchIfEmpty(Mono.error(new BusinessNotFoundException("Company not found")))
                     .flatMap(company -> authoritiesMono
                         .flatMap(authorities -> {
                             adminUserDTO.setAuthorities(authorities);
@@ -87,7 +90,7 @@ public class AppUserServiceImpl implements AppUserService {
                             return appUserRepository.save(appUser)
                                 .map(appUserMapper::toDto);
                         }))
-                    .doOnSuccess(dto -> log.debug("Saved company: {}", dto));
+                    .doOnSuccess(dto -> log.debug("Saved user {}: {}",userType, dto));
             });
 
     }

@@ -15,6 +15,7 @@ public class CompanySqlHelper {
         columns.add(Column.aliased("valid_until", table, columnPrefix + "_valid_until"));
         columns.add(Column.aliased("status", table, columnPrefix + "_status"));
         columns.add(Column.aliased("password", table, columnPrefix + "_password"));
+        columns.add(Column.aliased("phone_number", table, columnPrefix + "_phone_number"));
 
         return columns;
     }

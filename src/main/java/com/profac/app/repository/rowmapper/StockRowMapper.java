@@ -32,6 +32,7 @@ public class StockRowMapper implements BiFunction<Row, String, Stock> {
         entity.setInitialQuantity(converter.fromRow(row, prefix + "_initial_quantity", Integer.class));
         entity.setRemainingQuantity(converter.fromRow(row, prefix + "_remaining_quantity", Integer.class));
         entity.setStatus(converter.fromRow(row, prefix + "_status", StockStatus.class));
+        entity.setCompanyId(converter.fromRow(row, prefix + "_company_id", Long.class));
         entity.setProductId(converter.fromRow(row, prefix + "_product_id", Long.class));
         return entity;
     }

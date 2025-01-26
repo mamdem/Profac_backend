@@ -1,5 +1,6 @@
 package com.profac.app.service.impl;
 
+import com.profac.app.domain.Category;
 import com.profac.app.repository.CategoryRepository;
 import com.profac.app.service.CategoryService;
 import com.profac.app.service.dto.CategoryDTO;
@@ -31,9 +32,9 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Mono<CategoryDTO> save(CategoryDTO categoryDTO) {
+    public Mono<CategoryDTO> save(Category categoryDTO) {
         log.debug("Request to save Category : {}", categoryDTO);
-        return categoryRepository.save(categoryMapper.toEntity(categoryDTO)).map(categoryMapper::toDto);
+        return categoryRepository.save(categoryDTO).map(categoryMapper::toDto);
     }
 
     @Override

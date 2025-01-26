@@ -24,11 +24,11 @@ public class Stock extends AbstractAuditingEntity<Long> implements Serializable 
     private Long id;
 
     @NotNull(message = "must not be null")
-    @jakarta.persistence.Column(name = "total_amount", precision = 21, scale = 2)
+    @Column("total_amount")
     private BigDecimal totalAmount;
 
     @NotNull(message = "must not be null")
-    @jakarta.persistence.Column(name = "total_amount_sold", precision = 21, scale = 2)
+    @Column("total_amount_sold")
     private BigDecimal totalAmountSold;
 
     @NotNull(message = "must not be null")
@@ -43,8 +43,15 @@ public class Stock extends AbstractAuditingEntity<Long> implements Serializable 
     private StockStatus status;
 
     @Transient
-    @JsonIgnoreProperties(value = { "stocks", "images", "category", "invoices" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "appUsers", "invoices", "stocks" }, allowSetters = true)
+    private Company company;
+
+    @Transient
+    @JsonIgnoreProperties(value = { "stocks", "images", "category", "invoiceProducts" }, allowSetters = true)
     private Product product;
+
+    @Column("company_id")
+    private Long companyId;
 
     @Column("product_id")
     private Long productId;
@@ -74,7 +81,7 @@ public class Stock extends AbstractAuditingEntity<Long> implements Serializable 
     }
 
     public void setTotalAmount(BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
+        this.totalAmount = totalAmount != null ? totalAmount.stripTrailingZeros() : null;
     }
 
     public BigDecimal getTotalAmountSold() {
@@ -87,7 +94,7 @@ public class Stock extends AbstractAuditingEntity<Long> implements Serializable 
     }
 
     public void setTotalAmountSold(BigDecimal totalAmountSold) {
-        this.totalAmountSold = totalAmountSold ;
+        this.totalAmountSold = totalAmountSold != null ? totalAmountSold.stripTrailingZeros() : null;
     }
 
     public Integer getInitialQuantity() {
@@ -129,6 +136,20 @@ public class Stock extends AbstractAuditingEntity<Long> implements Serializable 
         this.status = status;
     }
 
+    public Company getCompany() {
+        return this.company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+        this.companyId = company != null ? company.getId() : null;
+    }
+
+    public Stock company(Company company) {
+        this.setCompany(company);
+        return this;
+    }
+
     public Product getProduct() {
         return this.product;
     }
@@ -141,6 +162,14 @@ public class Stock extends AbstractAuditingEntity<Long> implements Serializable 
     public Stock product(Product product) {
         this.setProduct(product);
         return this;
+    }
+
+    public Long getCompanyId() {
+        return this.companyId;
+    }
+
+    public void setCompanyId(Long company) {
+        this.companyId = company;
     }
 
     public Long getProductId() {

@@ -14,9 +14,8 @@ public class InvoiceSqlHelper {
         columns.add(Column.aliased("invoice_number", table, columnPrefix + "_invoice_number"));
         columns.add(Column.aliased("customer", table, columnPrefix + "_customer"));
         columns.add(Column.aliased("invoice_date", table, columnPrefix + "_invoice_date"));
-        columns.add(Column.aliased("quantity", table, columnPrefix + "_quantity"));
         columns.add(Column.aliased("status", table, columnPrefix + "_status"));
-
+        columns.add(Column.aliased("company_id", table, columnPrefix + "_company_id"));
         return columns;
     }
 }

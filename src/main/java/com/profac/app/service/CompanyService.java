@@ -1,5 +1,6 @@
 package com.profac.app.service;
 
+import com.profac.app.domain.Company;
 import com.profac.app.service.dto.CompanyDTO;
 import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
@@ -24,6 +25,8 @@ public interface CompanyService {
      * @return the persisted entity.
      */
     Mono<CompanyDTO> update(CompanyDTO companyDTO);
+
+    Mono<Company> findByPhoneNumber();
 
     /**
      * Partially updates a company.

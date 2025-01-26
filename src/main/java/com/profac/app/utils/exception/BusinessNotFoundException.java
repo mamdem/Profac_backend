@@ -14,4 +14,7 @@ public class BusinessNotFoundException extends BusinessException {
     public BusinessNotFoundException(String title, String message) {
         super(title, message);
     }
+    public BusinessNotFoundException(String message) {
+        super(message);
+    }
 }

@@ -227,7 +227,6 @@ public class StockResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the stockDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
     public Mono<ResponseEntity<StockDTO>> getStock(@PathVariable Long id) {
        try{ log.debug("REST request to get Stock : {}", id);
         Mono<StockDTO> stockDTO = stockService.findOne(id);

@@ -1,6 +1,5 @@
 package com.profac.app.service.dto;
 
-import com.profac.app.domain.AbstractAuditingEntity;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.math.BigDecimal;

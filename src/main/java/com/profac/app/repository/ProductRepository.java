@@ -1,8 +1,6 @@
 package com.profac.app.repository;
 
-import com.profac.app.domain.Company;
 import com.profac.app.domain.Product;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;

@@ -4,13 +4,15 @@ import static com.profac.app.security.SecurityUtils.AUTHORITIES_KEY;
 import static com.profac.app.security.SecurityUtils.JWT_ALGORITHM;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.profac.app.domain.User;
+import com.profac.app.repository.UserRepository;
+import com.profac.app.security.SecurityUtils;
+import com.profac.app.utils.exception.BusinessNotFoundException;
 import com.profac.app.web.rest.vm.LoginVM;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +42,7 @@ public class AuthenticateController {
     private final Logger log = LoggerFactory.getLogger(AuthenticateController.class);
 
     private final JwtEncoder jwtEncoder;
-
+    private final UserRepository userRepository;
     @Value("${jhipster.security.authentication.jwt.token-validity-in-seconds:0}")
     private long tokenValidityInSeconds;
 
@@ -49,8 +51,9 @@ public class AuthenticateController {
 
     private final ReactiveAuthenticationManager authenticationManager;
 
-    public AuthenticateController(JwtEncoder jwtEncoder, ReactiveAuthenticationManager authenticationManager) {
+    public AuthenticateController(JwtEncoder jwtEncoder, UserRepository userRepository, ReactiveAuthenticationManager authenticationManager) {
         this.jwtEncoder = jwtEncoder;
+        this.userRepository = userRepository;
         this.authenticationManager = authenticationManager;
     }
 
@@ -64,8 +67,8 @@ public class AuthenticateController {
             )
             .map(token -> {
                 HttpHeaders httpHeaders = new HttpHeaders();
-                httpHeaders.setBearerAuth(token.get("jwt").toString());
-                return new ResponseEntity<>(new JWTToken(token.get("jwt").toString(), token.get("profile").toString()), httpHeaders, HttpStatus.OK);
+                httpHeaders.setBearerAuth(token);
+                return new ResponseEntity<>(new JWTToken(token), httpHeaders, HttpStatus.OK);
             });
     }
 
@@ -81,7 +84,7 @@ public class AuthenticateController {
         return request.getPrincipal().map(Principal::getName);
     }
 
-    public Map<String, Object> createToken(Authentication authentication, boolean rememberMe) {
+    public String createToken(Authentication authentication, boolean rememberMe) {
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(" "));
 
         Instant now = Instant.now();
@@ -101,10 +104,7 @@ public class AuthenticateController {
             .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
-        Map<String, Object> response = new HashMap<>();
-        response.put("jwt", this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue());
-        response.put("profile", authorities);
-        return response;
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
     }
 
     /**
@@ -113,27 +113,25 @@ public class AuthenticateController {
     static class JWTToken {
 
         private String idToken;
-        private String profile;
 
-        JWTToken(String idToken, String profile) {
+        JWTToken(String idToken) {
             this.idToken = idToken;
-            this.profile = profile;
         }
 
         @JsonProperty("id_token")
         String getIdToken() {
             return idToken;
         }
-        @JsonProperty("profile")
-        String getProfile() {
-            return profile;
-        }
 
         void setIdToken(String idToken) {
             this.idToken = idToken;
         }
-        void setProfile(String profile) {
-            this.profile = profile;
-        }
+    }
+    @GetMapping("/current-user")
+    public Mono<User> getCurrentUserCompany() {
+        return SecurityUtils.getCurrentUserLogin()
+            .flatMap(userRepository::findOneByLogin)
+            .switchIfEmpty(Mono.error(new BusinessNotFoundException("No User found!")));
     }
 }
+

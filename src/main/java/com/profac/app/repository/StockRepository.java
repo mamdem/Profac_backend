@@ -1,6 +1,5 @@
 package com.profac.app.repository;
 
-import com.profac.app.domain.Product;
 import com.profac.app.domain.Stock;
 import com.profac.app.domain.enumeration.StockStatus;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +27,13 @@ public interface StockRepository extends ReactiveCrudRepository<Stock, Long>, St
         "JOIN Product p ON s.product_id = p.id " +
         "WHERE c.id = :companyId LIMIT :limit OFFSET :offset")
     Flux<Stock> findAllByCompanyId(Long companyId, int limit, int offset);
+    @Query("SELECT s.id AS stockId, s.quantity, c.name AS companyName, p.name AS productName " +
+        "FROM Stock s " +
+        "JOIN Company c ON s.company_id = c.id " +
+        "JOIN Product p ON s.product_id = p.id " +
+        "WHERE c.id = :companyId AND s.id = :id")
+    Mono<Stock> findAllByCompanyIdAndId(Long companyId, Long id);
+
     Flux<Stock> findAllByCompanyId(Long id);
 
     @Override

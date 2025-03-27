@@ -1,6 +1,5 @@
 package com.profac.app.service.dto;
 
-import com.profac.app.domain.AbstractAuditingEntity;
 import com.profac.app.domain.enumeration.CategoryStatus;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;

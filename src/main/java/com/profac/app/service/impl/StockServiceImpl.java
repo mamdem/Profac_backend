@@ -18,7 +18,6 @@ import com.profac.app.utils.encoder.Base64Encoder;
 import com.profac.app.utils.exception.BusinessBadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +25,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigDecimal;
-import java.util.Set;
 
 /**
  * Service Implementation for managing {@link com.profac.app.domain.Stock}.
@@ -120,6 +118,37 @@ public class StockServiceImpl implements StockService {
             return companyService.findByPhoneNumber()
                 .flatMapMany(c -> stockRepository
                     .findAllByCompanyId(c.getId(), size, offset)
+                    .flatMap(stock ->
+                        Mono.zip(
+                            Mono.just(stock),
+                            companyService.findOne(stock.getCompanyId()),
+                            productService.findOne(stock.getProductId())
+                        )
+                    )
+                    .map(tuple -> {
+                        Stock stock = tuple.getT1();
+                        CompanyDTO company = tuple.getT2();
+                        ProductDTO product = tuple.getT3();
+                        product.setAmount(new BigDecimal(product.getAmount().stripTrailingZeros().toPlainString()));
+                        StockDTO stockDTO = stockMapper.toDto(stock);
+                        stockDTO.setCompany(company);
+                        stockDTO.setProduct(product);
+
+                        return stockDTO;
+                    }));
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
+        }
+    }
+
+    @Override
+    public Mono<StockDTO> stockDetails(Long id) {
+        try{
+            log.debug("Request to get Stock details: {}", id);
+            return companyService.findByPhoneNumber()
+                .flatMap(c -> stockRepository
+                    .findAllByCompanyIdAndId(c.getId(), id)
                     .flatMap(stock ->
                         Mono.zip(
                             Mono.just(stock),

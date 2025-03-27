@@ -2,6 +2,7 @@ package com.profac.app.service.impl;
 
 import com.profac.app.domain.AppUser;
 import com.profac.app.domain.Authority;
+import com.profac.app.domain.Company;
 import com.profac.app.domain.enumeration.AppUserStatus;
 import com.profac.app.domain.enumeration.UserType;
 import com.profac.app.repository.AppUserRepository;
@@ -78,6 +79,8 @@ public class AppUserServiceImpl implements AppUserService {
                 log.debug("Logged user: {}", userLogin);
                 appUser.setCreatedBy(userLogin);
                 appUser.setLastModifiedBy(userLogin);
+                adminUserDTO.setFirstName(appUserDTO.getFirstName());
+                adminUserDTO.setLastName(appUserDTO.getLastName());
                 return companyRepository.findByPhoneNumber(userLogin)
                     .switchIfEmpty(Mono.error(new BusinessNotFoundException("Company not found")))
                     .flatMap(company -> authoritiesMono
@@ -122,6 +125,7 @@ public class AppUserServiceImpl implements AppUserService {
         log.debug("Request to get all AppUsers");
         return appUserRepository.findAllBy(pageable).map(appUserMapper::toDto);
     }
+
     public Mono<Long> countAll() {
         return appUserRepository.count();
     }
@@ -144,4 +148,12 @@ public class AppUserServiceImpl implements AppUserService {
         log.debug("Request to delete AppUser : {}", id);
         return appUserRepository.deleteById(id);
     }
+
+    @Transactional(readOnly = true)
+    @Override
+    public Flux<AppUserDTO> findByCompany(Company company, Pageable pageable) {
+        log.debug("Request to get all AppUsers by company: {}", company);
+        return appUserRepository.findByCompany(company,pageable).map(appUserMapper::toDto);
+    }
+
 }

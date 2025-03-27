@@ -17,6 +17,9 @@
 ---
 # Conditionally disable springdoc on missing api-docs profile
 spring:
+  jackson:
+    generator:
+      write-numbers-as-strings: true
   config:
     activate:
       on-profile: '!api-docs'
@@ -93,10 +96,11 @@ spring:
     # The commented value for `active` can be replaced with valid Spring profiles to load.
     # Otherwise, it will be filled in by maven when building the JAR file
     # Either way, it can be overridden by `--spring.profiles.active` value passed in the commandline or `-Dspring.profiles.active` set in `JAVA_OPTS`
-    active: #spring.profiles.active#
+    active: prod #spring.profiles.active#
     group:
       dev:
-        - dev
+        - prod
+        #- dev
         - api-docs
         # Uncomment to activate TLS for the dev profile
         #- tls
@@ -138,7 +142,7 @@ springdoc:
 # Properties to be exposed on the /info management endpoint
 info:
   # Comma separated list of profiles that will trigger the ribbon to show
-  display-ribbon-on-profiles: 'dev'
+  display-ribbon-on-profiles: 'prod'
 
 # ===================================================================
 # JHipster specific properties

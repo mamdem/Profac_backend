@@ -1,5 +1,6 @@
 package com.profac.app.service;
 
+import com.profac.app.domain.Company;
 import com.profac.app.service.dto.AppUserDTO;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,4 +68,7 @@ public interface AppUserService {
      * @return a Mono to signal the deletion
      */
     Mono<Void> delete(Long id);
+
+    @Transactional(readOnly = true)
+    Flux<AppUserDTO> findByCompany(Company company, Pageable pageable);
 }

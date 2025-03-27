@@ -5,7 +5,6 @@ import com.profac.app.domain.Product;
 import com.profac.app.domain.Stock;
 import com.profac.app.domain.enumeration.CategoryStatus;
 import com.profac.app.domain.enumeration.ProductStatus;
-import com.profac.app.repository.AppUserRepository;
 import com.profac.app.repository.ProductRepository;
 import com.profac.app.repository.StockRepository;
 import com.profac.app.security.SecurityUtils;

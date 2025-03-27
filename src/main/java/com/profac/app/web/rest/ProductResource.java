@@ -3,32 +3,22 @@ package com.profac.app.web.rest;
 import com.profac.app.repository.ProductRepository;
 import com.profac.app.security.AuthoritiesConstants;
 import com.profac.app.service.ProductService;
-import com.profac.app.service.dto.CategoryDTO;
 import com.profac.app.service.dto.ProductDTO;
 import com.profac.app.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.util.UriComponentsBuilder;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.PaginationUtil;
 import tech.jhipster.web.util.reactive.ResponseUtil;
 
 /**
@@ -76,7 +66,7 @@ public class ProductResource {
     }
 */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<ProductDTO>> updateProduct(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody ProductDTO productDTO
@@ -120,7 +110,7 @@ public class ProductResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<ProductDTO>> partialUpdateProduct(
         @PathVariable(value = "id", required = false) final Long id,
         @NotNull @RequestBody ProductDTO productDTO
@@ -155,7 +145,7 @@ public class ProductResource {
 
 
     /*@GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<List<ProductDTO>>> getAllProducts(
         @org.springdoc.core.annotations.ParameterObject Pageable pageable,
         ServerHttpRequest request
@@ -184,7 +174,7 @@ public class ProductResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the productDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<ProductDTO>> getProduct(@PathVariable Long id) {
         log.debug("REST request to get Product : {}", id);
         Mono<ProductDTO> productDTO = productService.findOne(id);
@@ -198,7 +188,7 @@ public class ProductResource {
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAuthority(\"" + AuthoritiesConstants.ADMIN + "\")")
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<Void>> deleteProduct(@PathVariable Long id) {
         log.debug("REST request to delete Product : {}", id);
         return productService

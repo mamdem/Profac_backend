@@ -4,9 +4,9 @@ import com.profac.app.repository.CompanyRepository;
 import com.profac.app.security.AuthoritiesConstants;
 import com.profac.app.service.CompanyService;
 import com.profac.app.service.ProductService;
+import com.profac.app.service.dto.AppUserDTO;
 import com.profac.app.service.dto.CategoryDTO;
 import com.profac.app.service.dto.CompanyDTO;
-import com.profac.app.service.dto.ProductDTO;
 import com.profac.app.utils.exception.BusinessBadRequestException;
 import com.profac.app.utils.exception.BusinessNotFoundException;
 import com.profac.app.web.rest.errors.BadRequestAlertException;
@@ -262,11 +262,32 @@ public class CompanyResource {
 
     @GetMapping("/categories")
     public ResponseEntity<Flux<CategoryDTO>> findAllCategoryByCompany() {
-    try {    log.debug("REST request to get categories:");
-        return ResponseEntity.ok(productService.findAllCategoryByCompany());
-    } catch (Exception e) {
-        log.error("Une erreur s'est produite: {}", e.getMessage());
-        throw new BusinessBadRequestException("Une erreur s'est produite");
+        try {    log.debug("REST request to get categories:");
+            return ResponseEntity.ok(productService.findAllCategoryByCompany());
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
+        }
     }
+
+    @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Mono<ResponseEntity<List<AppUserDTO>>> getAllUsersByCompanies(
+        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+        ServerHttpRequest request
+    ) {
+        log.debug("REST request to get a page of users by company");
+
+        return companyService.findAppUsersByCompany(pageable)
+            .collectList()
+            .map(userList -> {
+                Page<AppUserDTO> page = new PageImpl<>(userList, pageable, userList.size());
+                return ResponseEntity
+                    .ok()
+                    .headers(PaginationUtil.generatePaginationHttpHeaders(
+                        UriComponentsBuilder.fromHttpRequest(request), page
+                    ))
+                    .body(userList);
+            });
     }
+
 }

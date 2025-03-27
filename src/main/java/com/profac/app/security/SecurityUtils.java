@@ -33,6 +33,7 @@ public final class SecurityUtils {
             .flatMap(authentication -> Mono.justOrEmpty(extractPrincipal(authentication)));
     }
 
+
     private static String extractPrincipal(Authentication authentication) {
         if (authentication == null) {
             return null;

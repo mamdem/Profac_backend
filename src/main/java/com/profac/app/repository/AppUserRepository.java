@@ -1,6 +1,7 @@
 package com.profac.app.repository;
 
 import com.profac.app.domain.AppUser;
+import com.profac.app.domain.Company;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -43,6 +44,9 @@ public interface AppUserRepository extends ReactiveCrudRepository<AppUser, Long>
 
     @Query("SELECT * FROM app_user entity INNER JOIN company c ON entity.company_id = c.id WHERE entity.phone_number = :phone")
     Mono<AppUser> findByPhoneNumber(@Param("phone") String phone);
+
+    Flux<AppUser> findByCompany(Company company, Pageable  pageable);
+
 }
 
 interface AppUserRepositoryInternal {

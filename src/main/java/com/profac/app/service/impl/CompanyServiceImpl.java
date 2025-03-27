@@ -9,8 +9,8 @@ import com.profac.app.security.SecurityUtils;
 import com.profac.app.service.AppUserService;
 import com.profac.app.service.CompanyService;
 import com.profac.app.service.dto.AdminUserDTO;
+import com.profac.app.service.dto.AppUserDTO;
 import com.profac.app.service.dto.CompanyDTO;
-import com.profac.app.service.mapper.CompanyMapper;
 import com.profac.app.utils.exception.BusinessBadRequestException;
 import com.profac.app.utils.exception.BusinessNotFoundException;
 import com.profac.app.web.rest.UserResource;
@@ -62,9 +62,13 @@ public class CompanyServiceImpl implements CompanyService {
         Company company = this.toEntity(companyDTO);
         company.setPassword(RandomUtil.generatePassword());
         company.setStatus(CompanyStatus.ACTIVE);
+
+
         AdminUserDTO adminUserDTO = new AdminUserDTO();
         adminUserDTO.setLogin(companyDTO.getPhoneNumber());
         adminUserDTO.setPassword(company.getPassword());
+        adminUserDTO.setFirstName(company.getName());
+        adminUserDTO.setLastName(company.getName());
 
         return company.initAuditFields().then( authoritiesMono
                 .flatMap(authorities -> {
@@ -83,7 +87,8 @@ public class CompanyServiceImpl implements CompanyService {
     }
     @Override
     public Mono<Company> findByPhoneNumber() {
-        try{   return SecurityUtils.getCurrentUserLogin()
+        try{
+            return SecurityUtils.getCurrentUserLogin()
             .flatMap(login -> companyRepository.findByPhoneNumber(login)
                 .switchIfEmpty(appUserService.findByPhoneNumber(login)
                     .flatMap(appUser -> companyRepository
@@ -187,4 +192,18 @@ public class CompanyServiceImpl implements CompanyService {
             entity.setPhoneNumber( dto.getPhoneNumber() );
         }
     }
+
+    @Override
+    public Flux<AppUserDTO> findAppUsersByCompany(Pageable pageable) {
+        return SecurityUtils.getCurrentUserLogin()
+            .flatMapMany(login -> companyRepository.findByPhoneNumber(login)
+                .flatMapMany(company -> appUserService.findByCompany(company, pageable))
+                .switchIfEmpty(Mono.error(new BusinessNotFoundException("No company found!")))
+            )
+            .onErrorResume(e -> {
+                log.error("Une erreur s'est produite: {}", e.getMessage(), e);
+                return Mono.error(new BusinessBadRequestException("Une erreur s'est produite"));
+            });
+    }
+
 }

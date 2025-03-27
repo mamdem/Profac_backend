@@ -1,4 +1,5 @@
 package com.profac.app.service.dto;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.profac.app.domain.enumeration.InvoiceStatus;
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -7,6 +8,7 @@ import java.util.Set;
 public class InvoiceResponseDTO {
     private Long invoiceNumber;
     private String customer;
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal amount;
     private InvoiceStatus status;
     private Set<ProductResponseDTO> products = new HashSet<>();

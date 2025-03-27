@@ -14,7 +14,6 @@ import java.util.Objects;
 public class StockDTO extends AbstractAuditingEntity<Long> implements Serializable {
 
     private Long id;
-
     private BigDecimal totalAmount;
     private BigDecimal totalAmountSold;
     private Integer initialQuantity;

@@ -1,14 +1,11 @@
 package com.profac.app.service;
 
 import com.profac.app.domain.Product;
-import com.profac.app.service.dto.ProductDTO;
 import com.profac.app.service.dto.StockDTO;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.codec.multipart.FilePart;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.Set;
 
 /**
  * Service Interface for managing {@link com.profac.app.domain.Stock}.
@@ -39,6 +36,8 @@ public interface StockService {
     Mono<StockDTO> partialUpdate(StockDTO stockDTO);
 
     Flux<StockDTO> findAll(int page, int size);
+
+    Mono<StockDTO> stockDetails(Long id);
 
     /**
      * Returns the number of stocks available.

@@ -1,5 +1,6 @@
 package com.profac.app.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.profac.app.domain.enumeration.ProductStatus;
 import jakarta.validation.constraints.*;
@@ -35,6 +36,7 @@ public class Product extends AbstractAuditingEntity<Long> implements Serializabl
 
     @NotNull(message = "must not be null")
     @Column("amount")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal amount;
 
     @Column("description")

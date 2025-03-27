@@ -1,6 +1,5 @@
 package com.profac.app.service.dto;
 
-import com.profac.app.domain.AbstractAuditingEntity;
 import com.profac.app.domain.enumeration.UserType;
 import com.profac.app.domain.enumeration.AppUserStatus;
 import jakarta.validation.constraints.*;

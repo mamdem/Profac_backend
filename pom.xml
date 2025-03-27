@@ -74,7 +74,13 @@
         <validation-api.version>3.0.2</validation-api.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <lombok.version>1.18.28</lombok.version>
+        <hibernate.version>6.2.13.Final</hibernate.version>
+        <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
+        <openapi-generator-maven-plugin.version>7.0.1</openapi-generator-maven-plugin.version>
+        <checksum-maven-plugin.version>1.11</checksum-maven-plugin.version>
+        <maven-antrun-plugin.version>3.1.0</maven-antrun-plugin.version>
     </properties>
+
 
     <dependencyManagement>
         <dependencies>
@@ -89,6 +95,49 @@
     </dependencyManagement>
 
     <dependencies>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.13.0</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>libphonenumber</artifactId>
+            <version>8.12.57</version> <!-- Use the latest version available -->
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.lettuce</groupId>
+            <artifactId>lettuce-core</artifactId>
+            <version>6.3.2.RELEASE</version>
+        </dependency>
+
+        <!--        / custom-->
+        <!--  minio dependencies  start     -->
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.5.12</version>
+        </dependency>
+        <!--  minio dependencies end      -->
         <dependency>
             <groupId>tech.jhipster</groupId>
             <artifactId>jhipster-framework</artifactId>
@@ -148,6 +197,12 @@
             <artifactId>spring-boot-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.asynchttpclient/async-http-client -->
+        <dependency>
+            <groupId>org.asynchttpclient</groupId>
+            <artifactId>async-http-client</artifactId>
+            <version>2.12.3</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
@@ -168,6 +223,18 @@
         <dependency>
             <groupId>com.fasterxml.jackson.module</groupId>
             <artifactId>jackson-module-jaxb-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.playtika.reactivefeign</groupId>
+            <artifactId>feign-reactor-cloud</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.playtika.reactivefeign</groupId>
+            <artifactId>feign-reactor-spring-configuration</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.playtika.reactivefeign</groupId>
+            <artifactId>feign-reactor-webclient</artifactId>
         </dependency>
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
@@ -191,6 +258,21 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>${commons-beanutils.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit-platform-engine</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-spring</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.dropwizard.metrics</groupId>
@@ -231,13 +313,29 @@
             <artifactId>jakarta.persistence-api</artifactId>
         </dependency>
         <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-console</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
             <version>${liquibase.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.yaml</groupId>
+                    <artifactId>snakeyaml</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
@@ -251,8 +349,46 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-stream-binder-rabbit</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-commons</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.retry</groupId>
+            <artifactId>spring-retry</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>testcontainers</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.testcontainers</groupId>
@@ -260,20 +396,37 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.34</version>
-            <scope>provided</scope>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>rabbitmq</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId>
+            <version>5.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testng</groupId>
+            <artifactId>testng</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.instancio</groupId>
+            <artifactId>instancio-junit</artifactId>
+            <version>3.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.instancio</groupId>
+            <artifactId>instancio-core</artifactId>
+            <version>3.2.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -372,7 +525,7 @@
                     <version>${spotless-maven-plugin.version}</version>
                     <configuration>
                         <java>
-                            <!-- <removeUnusedImports/> -->
+                            <removeUnusedImports/>
                         </java>
                     </configuration>
                     <executions>
@@ -400,7 +553,7 @@
                             </platforms>
                         </from>
                         <to>
-                            <image>profac:latest</image>
+                            <image>peopleinput/${project.artifactId}:latest</image>
                         </to>
                         <container>
                             <entrypoint>
@@ -409,11 +562,12 @@
                                 <arg>/entrypoint.sh</arg>
                             </entrypoint>
                             <ports>
-                                <port>8089</port>
+                                <port>8081</port>
                             </ports>
                             <environment>
                                 <SPRING_OUTPUT_ANSI_ENABLED>ALWAYS</SPRING_OUTPUT_ANSI_ENABLED>
                                 <JHIPSTER_SLEEP>0</JHIPSTER_SLEEP>
+                                <!--suppress UnresolvedMavenProperty -->
                             </environment>
                             <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                             <user>1000</user>
@@ -514,11 +668,6 @@
                                 <artifactId>lombok</artifactId>
                                 <version>${lombok.version}</version>
                             </path>
-                            <path>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok-mapstruct-binding</artifactId>
-                                <version>${lombok-mapstruct-binding.version}</version>
-                            </path>
                         </annotationProcessorPaths>
                     </configuration>
                 </plugin>
@@ -528,7 +677,6 @@
                     <version>${maven-eclipse-plugin.version}</version>
                     <configuration>
                         <downloadSources>true</downloadSources>
-                        <downloadJavadocs>true</downloadJavadocs>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -562,8 +710,8 @@
                                 <version>[${maven.version},)</version>
                             </requireMavenVersion>
                             <requireJavaVersion>
-                                <message>You are running an incompatible version of Java. JHipster supports JDK 17 to 21.</message>
-                                <version>[17,18),[18,19),[19,20),[20,21),[21,22)</version>
+                                <message>You are running an incompatible version of Java. JHipster supports JDK 17 to 19.</message>
+                                <version>[17,18),[18,19),[19,20)</version>
                             </requireJavaVersion>
                         </rules>
                     </configuration>
@@ -627,7 +775,7 @@
                     <version>${maven-resources-plugin.version}</version>
                     <executions>
                         <execution>
-                            <id>config-resources</id>
+                            <id>default-resources</id>
                             <phase>validate</phase>
                             <goals>
                                 <goal>copy-resources</goal>
@@ -645,6 +793,13 @@
                                         <includes>
                                             <include>config/*.yml</include>
                                         </includes>
+                                    </resource>
+                                    <resource>
+                                        <directory>src/main/resources/</directory>
+                                        <filtering>false</filtering>
+                                        <excludes>
+                                            <exclude>config/*.yml</exclude>
+                                        </excludes>
                                     </resource>
                                 </resources>
                             </configuration>
@@ -796,11 +951,12 @@
                             <artifactId>jakarta.validation-api</artifactId>
                             <version>${validation-api.version}</version>
                         </dependency>
-                        <dependency>
-                            <groupId>com.h2database</groupId>
-                            <artifactId>h2</artifactId>
-                            <version>${h2.version}</version>
-                        </dependency>
+
+                        <!--                        <dependency>-->
+                        <!--                            <groupId>com.h2database</groupId>-->
+                        <!--                            <artifactId>h2</artifactId>-->
+                        <!--                            <version>${h2.version}</version>-->
+                        <!--                        </dependency>-->
                     </dependencies>
                 </plugin>
                 <plugin>
@@ -828,6 +984,7 @@
                 <!-- default Spring profiles -->
                 <spring.profiles.active>dev${profile.tls}${profile.no-liquibase}</spring.profiles.active>
                 <profile.test>testdev</profile.test>
+                <profile.test.faker>faker</profile.test.faker>
                 <liquibase-plugin.hibernate-dialect>org.hibernate.dialect.H2Dialect</liquibase-plugin.hibernate-dialect>
                 <liquibase-plugin.driver>org.h2.Driver</liquibase-plugin.driver>
                 <liquibase-plugin.url>jdbc:h2:file:${project.build.directory}/h2db/db/profac</liquibase-plugin.url>
@@ -848,20 +1005,21 @@
                     <groupId>io.r2dbc</groupId>
                     <artifactId>r2dbc-h2</artifactId>
                 </dependency>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>r2dbc-postgresql</artifactId>
+                    <version>1.0.2.RELEASE</version>
+                </dependency>
+                <dependency>
+                    <groupId>io.r2dbc</groupId>
+                    <artifactId>r2dbc-pool</artifactId>
+                    <version>1.0.1.RELEASE</version>
+                </dependency>
             </dependencies>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                            <testExcludes>
-                                <testExclude>com/profac/app/config/PostgreSqlTestContainer.java</testExclude>
-                            </testExcludes>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
         <profile>
             <!-- This is automatically activated when working in Eclipse -->
@@ -944,7 +1102,7 @@
                 <liquibase-plugin.hibernate-dialect>org.hibernate.dialect.PostgreSQLDialect</liquibase-plugin.hibernate-dialect>
                 <liquibase-plugin.driver>org.postgresql.Driver</liquibase-plugin.driver>
                 <liquibase-plugin.url>jdbc:postgresql://localhost:5432/profac</liquibase-plugin.url>
-                <liquibase-plugin.username>profac</liquibase-plugin.username>
+                <liquibase-plugin.username/>
                 <liquibase-plugin.password/>
             </properties>
             <build>
@@ -978,13 +1136,28 @@
                 </plugins>
             </build>
             <dependencies>
+                <!--               <dependency>
+                                   <groupId>org.postgresql</groupId>
+                                   <artifactId>postgresql</artifactId>
+                               </dependency>
+                               <dependency>
+                                   <groupId>org.postgresql</groupId>
+                                   <artifactId>r2dbc-postgresql</artifactId>
+                                   <version>1.0.2.RELEASE</version>
+                               </dependency>-->
                 <dependency>
-                    <groupId>org.postgresql</groupId>
-                    <artifactId>postgresql</artifactId>
+                    <groupId>io.r2dbc</groupId>
+                    <artifactId>r2dbc-pool</artifactId>
+                    <version>1.0.1.RELEASE</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.postgresql</groupId>
+                    <groupId>io.r2dbc</groupId>
                     <artifactId>r2dbc-postgresql</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>io.r2dbc</groupId>
+                    <artifactId>r2dbc-spi</artifactId>
+                    <version>1.0.0.RELEASE</version>
                 </dependency>
             </dependencies>
         </profile>

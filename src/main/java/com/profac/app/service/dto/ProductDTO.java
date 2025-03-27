@@ -1,9 +1,9 @@
 package com.profac.app.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.profac.app.domain.enumeration.ProductStatus;
 import jakarta.persistence.Lob;
 import jakarta.validation.constraints.*;
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Objects;
 
@@ -11,7 +11,7 @@ import java.util.Objects;
  * A DTO for the {@link com.profac.app.domain.Product} entity.
  */
 @SuppressWarnings("common-java:DuplicatedBlocks")
-public class ProductDTO implements Serializable {
+public class ProductDTO {
 
     private Long id;
 
@@ -22,6 +22,7 @@ public class ProductDTO implements Serializable {
     private String name;
 
     @NotNull(message = "must not be null")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal amount;
 
     @Lob
@@ -60,7 +61,7 @@ public class ProductDTO implements Serializable {
     }
 
     public void setAmount(BigDecimal amount) {
-        this.amount = amount;
+        this.amount = amount != null ? amount.stripTrailingZeros() : null;
     }
 
     public String getDescription() {

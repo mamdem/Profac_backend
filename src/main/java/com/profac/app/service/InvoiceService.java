@@ -4,7 +4,6 @@ import com.profac.app.service.dto.InvoiceDTO;
 import com.profac.app.service.dto.InvoiceResponseDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -68,4 +67,6 @@ public interface InvoiceService {
     Mono<Void> delete(Long id);
 
     Mono<Page<InvoiceResponseDTO>> findAll(int page, int size);
+
+    Mono<InvoiceResponseDTO> findByInvoiceNumber(Long invoiceNumber);
 }

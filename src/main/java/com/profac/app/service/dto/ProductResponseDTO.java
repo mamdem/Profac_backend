@@ -24,6 +24,7 @@ public class ProductResponseDTO implements Serializable {
 
     @NotNull(message = "must not be null")
     private BigDecimal amount;
+
     private Integer quantity;
 
     @Lob

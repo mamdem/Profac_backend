@@ -242,7 +242,7 @@ public class InvoiceProductResource {
         Mono<InvoiceProductDTO> invoiceProductDTO = invoiceProductService.findOne(id);
         return ResponseUtil.wrapOrNotFound(invoiceProductDTO);
     } catch (Exception e) {
-        log.error("Une erreur s'est produite: {}", e.getMessage());
+        log.error("Une erreur s'est produite : {}", e.getMessage());
         throw new BusinessBadRequestException("Une erreur s'est produite");
     }
     }
@@ -267,7 +267,7 @@ public class InvoiceProductResource {
                 )
             );
     } catch (Exception e) {
-        log.error("Une erreur s'est produite: {}", e.getMessage());
+        log.error(" Une erreur s'est produite: {}", e.getMessage());
         throw new BusinessBadRequestException("Une erreur s'est produite");
     }
     }

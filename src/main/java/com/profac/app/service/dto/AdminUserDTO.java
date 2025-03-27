@@ -1,6 +1,5 @@
 package com.profac.app.service.dto;
 
-import com.profac.app.config.Constants;
 import com.profac.app.domain.Authority;
 import com.profac.app.domain.User;
 import jakarta.validation.constraints.*;

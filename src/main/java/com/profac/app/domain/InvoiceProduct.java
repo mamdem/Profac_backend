@@ -1,5 +1,6 @@
 package com.profac.app.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
@@ -27,6 +28,7 @@ public class InvoiceProduct extends AbstractAuditingEntity<Long>  implements Ser
     private Integer quantity;
 
     @Column("total_amount")
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
     private BigDecimal totalAmount;
 
     @Transient

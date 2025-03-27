@@ -1,6 +1,5 @@
 package com.profac.app.service.dto;
 
-import com.profac.app.domain.AbstractAuditingEntity;
 import com.profac.app.domain.enumeration.ImageStatus;
 import jakarta.persistence.Lob;
 import java.io.Serializable;

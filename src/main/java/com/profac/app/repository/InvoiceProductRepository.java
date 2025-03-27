@@ -1,6 +1,5 @@
 package com.profac.app.repository;
 
-import com.profac.app.domain.Invoice;
 import com.profac.app.domain.InvoiceProduct;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;

@@ -57,26 +57,26 @@ public class InvoiceResource {
     @PostMapping("")
     @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<InvoiceDTO>> createInvoice(@RequestBody InvoiceDTO invoiceDTO) throws URISyntaxException {
-      try {  log.debug("REST request to save Invoice : {}", invoiceDTO);
-        if (invoiceDTO.getId() != null) {
-            throw new BadRequestAlertException("A new invoice cannot already have an ID", ENTITY_NAME, "idexists");
+        try {  log.debug("REST request to save Invoice : {}", invoiceDTO);
+            if (invoiceDTO.getId() != null) {
+                throw new BadRequestAlertException("A new invoice cannot already have an ID", ENTITY_NAME, "idexists");
+            }
+            return invoiceService
+                .save(invoiceDTO)
+                .map(result -> {
+                    try {
+                        return ResponseEntity
+                            .created(new URI("/api/invoices/" + result.getId()))
+                            .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                            .body(result);
+                    } catch (URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
         }
-        return invoiceService
-            .save(invoiceDTO)
-            .map(result -> {
-                try {
-                    return ResponseEntity
-                        .created(new URI("/api/invoices/" + result.getId()))
-                        .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-                        .body(result);
-                } catch (URISyntaxException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-    } catch (Exception e) {
-        log.error("Une erreur s'est produite: {}", e.getMessage());
-        throw new BusinessBadRequestException("Une erreur s'est produite");
-    }
     }
 
     /**
@@ -95,35 +95,35 @@ public class InvoiceResource {
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody InvoiceDTO invoiceDTO
     ) throws URISyntaxException {
-     try {   log.debug("REST request to update Invoice : {}, {}", id, invoiceDTO);
-        if (invoiceDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, invoiceDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
+        try {   log.debug("REST request to update Invoice : {}, {}", id, invoiceDTO);
+            if (invoiceDTO.getId() == null) {
+                throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+            }
+            if (!Objects.equals(id, invoiceDTO.getId())) {
+                throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+            }
 
-        return invoiceRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
+            return invoiceRepository
+                .existsById(id)
+                .flatMap(exists -> {
+                    if (!exists) {
+                        return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                    }
 
-                return invoiceService
-                    .update(invoiceDTO)
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(result ->
-                        ResponseEntity
-                            .ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
-                            .body(result)
-                    );
-            });
-    } catch (Exception e) {
-        log.error("Une erreur s'est produite: {}", e.getMessage());
-        throw new BusinessBadRequestException("Une erreur s'est produite");
-    }
+                    return invoiceService
+                        .update(invoiceDTO)
+                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                        .map(result ->
+                            ResponseEntity
+                                .ok()
+                                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, result.getId().toString()))
+                                .body(result)
+                        );
+                });
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
+        }
     }
 
     /**
@@ -143,36 +143,36 @@ public class InvoiceResource {
         @PathVariable(value = "id", required = false) final Long id,
         @RequestBody InvoiceDTO invoiceDTO
     ) throws URISyntaxException {
-       try{ log.debug("REST request to partial update Invoice partially : {}, {}", id, invoiceDTO);
-        if (invoiceDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+        try{ log.debug("REST request to partial update Invoice partially : {}, {}", id, invoiceDTO);
+            if (invoiceDTO.getId() == null) {
+                throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
+            }
+            if (!Objects.equals(id, invoiceDTO.getId())) {
+                throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+            }
+
+            return invoiceRepository
+                .existsById(id)
+                .flatMap(exists -> {
+                    if (!exists) {
+                        return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
+                    }
+
+                    Mono<InvoiceDTO> result = invoiceService.partialUpdate(invoiceDTO);
+
+                    return result
+                        .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
+                        .map(res ->
+                            ResponseEntity
+                                .ok()
+                                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, res.getId().toString()))
+                                .body(res)
+                        );
+                });
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
         }
-        if (!Objects.equals(id, invoiceDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        return invoiceRepository
-            .existsById(id)
-            .flatMap(exists -> {
-                if (!exists) {
-                    return Mono.error(new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound"));
-                }
-
-                Mono<InvoiceDTO> result = invoiceService.partialUpdate(invoiceDTO);
-
-                return result
-                    .switchIfEmpty(Mono.error(new ResponseStatusException(HttpStatus.NOT_FOUND)))
-                    .map(res ->
-                        ResponseEntity
-                            .ok()
-                            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, res.getId().toString()))
-                            .body(res)
-                    );
-            });
-    } catch (Exception e) {
-        log.error("Une erreur s'est produite: {}", e.getMessage());
-        throw new BusinessBadRequestException("Une erreur s'est produite");
-    }
     }
 
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -181,13 +181,13 @@ public class InvoiceResource {
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "10") int size
     ) {
-      try{  log.debug("REST request to get a page of Invoices");
-        return invoiceService.findAll(page, size)
-            .map(ResponseEntity::ok);
-    } catch (Exception e) {
-        log.error("Une erreur s'est produite: {}", e.getMessage());
-        throw new BusinessBadRequestException("Une erreur s'est produite");
-    }
+        try{  log.debug("REST request to get a page of Invoices");
+            return invoiceService.findAll(page, size)
+                .map(ResponseEntity::ok);
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
+        }
     }
 
     /**
@@ -199,13 +199,13 @@ public class InvoiceResource {
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<InvoiceDTO>> getInvoice(@PathVariable Long id) {
-       try{ log.debug("REST request to get Invoice : {}", id);
-        Mono<InvoiceDTO> invoiceDTO = invoiceService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(invoiceDTO);
-    } catch (Exception e) {
-        log.error("Une erreur s'est produite: {}", e.getMessage());
-        throw new BusinessBadRequestException("Une erreur s'est produite");
-    }
+        try{ log.debug("REST request to get Invoice : {}", id);
+            Mono<InvoiceDTO> invoiceDTO = invoiceService.findOne(id);
+            return ResponseUtil.wrapOrNotFound(invoiceDTO);
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
+        }
     }
 
     /**
@@ -218,19 +218,28 @@ public class InvoiceResource {
     @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
     public Mono<ResponseEntity<Void>> deleteInvoice(@PathVariable Long id) {
         try{log.debug("REST request to delete Invoice : {}", id);
-        return invoiceService
-            .delete(id)
-            .then(
-                Mono.just(
-                    ResponseEntity
-                        .noContent()
-                        .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
-                        .build()
-                )
-            );
-    } catch (Exception e) {
-        log.error("Une erreur s'est produite: {}", e.getMessage());
-        throw new BusinessBadRequestException("Une erreur s'est produite");
+            return invoiceService
+                .delete(id)
+                .then(
+                    Mono.just(
+                        ResponseEntity
+                            .noContent()
+                            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
+                            .build()
+                    )
+                );
+        } catch (Exception e) {
+            log.error("Une erreur s'est produite: {}", e.getMessage());
+            throw new BusinessBadRequestException("Une erreur s'est produite");
+        }
     }
+    @GetMapping(value = "/details", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PreAuthorize("hasAnyAuthority('" + AuthoritiesConstants.ADMIN + "', '" + AuthoritiesConstants.CASHIER + "', '" + AuthoritiesConstants.SELLER + "')")
+    public Mono<ResponseEntity<InvoiceResponseDTO>> findByInvoiceNumber(
+        @RequestParam("invoiceNumber") Long invoiceNumber) {
+        log.debug("REST request to get Invoices by number: {}", invoiceNumber);
+        return invoiceService.findByInvoiceNumber(invoiceNumber)
+            .map(ResponseEntity::ok)
+            .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 }

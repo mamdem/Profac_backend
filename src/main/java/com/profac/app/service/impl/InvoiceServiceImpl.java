@@ -205,6 +205,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public InvoiceResponseDTO mapInvoiceResponseDTO(Invoice invoice, Set<Map.Entry<ProductDTO, Integer>> productQuantitySet, BigDecimal amount) {
         InvoiceResponseDTO invoiceResponseDTO = new InvoiceResponseDTO();
         invoiceResponseDTO.setInvoiceNumber(invoice.getInvoiceNumber());
+        invoiceResponseDTO.setCreateAt(invoice.getCreatedDate());
         invoiceResponseDTO.setAmount(amount);
         invoiceResponseDTO.setCustomer(invoice.getCustomer());
         invoiceResponseDTO.setStatus(invoice.getStatus());
